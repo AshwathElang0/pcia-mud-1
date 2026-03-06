@@ -146,4 +146,4 @@ def extract_and_plot_sam(image_path, output_plot_path, viz_path):
     plt.savefig(output_plot_path)
     print(f"Saved SAM plot to {output_plot_path}")
 
-extract_and_plot_sam('/home/ash/Desktop/acads/pcia/sample.jpeg', '/home/ash/Desktop/acads/pcia/sam_color_analysis.png', '/home/ash/Desktop/acads/pcia/sam_segmentation_viz.png')
+extract_and_plot_sam('/home/ash/Desktop/acads/pcia/samples/25th_min.jpeg', '/home/ash/Desktop/acads/pcia/sam_color_analysis.png', '/home/ash/Desktop/acads/pcia/sam_segmentation_viz.png')

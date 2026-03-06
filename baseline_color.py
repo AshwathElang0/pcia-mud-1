@@ -106,4 +106,4 @@ def extract_and_plot_colors(image_path, output_plot_path):
         plt.savefig(output_plot_path)
         print(f"Saved comparison plot to {output_plot_path}")
 
-extract_and_plot_colors('/home/ash/Desktop/acads/pcia/sample.jpeg', '/home/ash/Desktop/acads/pcia/baseline_color_analysis.png')
+extract_and_plot_colors('/home/ash/Desktop/acads/pcia/samples/25th_min.jpeg', '/home/ash/Desktop/acads/pcia/baseline_color_analysis.png')
