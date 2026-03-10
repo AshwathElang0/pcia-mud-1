@@ -1,8 +1,11 @@
 import pandas as pd
+import os
 
-df = pd.read_csv('/home/ash/Desktop/acads/pcia/temporal_data.csv')
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CSV_PATH = os.path.join(BASE_DIR, 'results', 'temporal', 'temporal_data.csv')
 
-# Let's average across the 3 rows
+df = pd.read_csv(CSV_PATH)
+
 col_avg = df.groupby(['Time', 'Column']).mean().reset_index()
 
 pivot_A = col_avg.pivot(index='Time', columns='Column', values='A_median')
@@ -20,4 +23,3 @@ print((pivot_R.iloc[-1] - pivot_R.iloc[0]).round(2))
 
 print("\n=== Max A* at t=25 ===")
 print(pivot_A.iloc[-1].round(2))
-

@@ -2,11 +2,17 @@ import cv2
 import numpy as np
 import torch
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
 from transformers import SamModel, SamProcessor
 from PIL import Image
-import random
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SAMPLES_DIR = os.path.join(BASE_DIR, 'samples')
+RESULTS_DIR = os.path.join(BASE_DIR, 'results', 'temporal')
 
 def extract_and_plot_sam(image_path, output_plot_path, viz_path):
     print("Loading image...")
@@ -75,8 +81,6 @@ def extract_and_plot_sam(image_path, output_plot_path, viz_path):
         scores = outputs.iou_scores.cpu().squeeze()
         
         if len(masks) > 0:
-            # masks[0] shape: (1, 3, H, W)
-            # We take the mask with the highest IOU score
             best_mask_idx = torch.argmax(scores).item()
             mask = masks[0][0][best_mask_idx].numpy().astype(bool)
             
@@ -146,4 +150,8 @@ def extract_and_plot_sam(image_path, output_plot_path, viz_path):
     plt.savefig(output_plot_path)
     print(f"Saved SAM plot to {output_plot_path}")
 
-extract_and_plot_sam('/home/ash/Desktop/acads/pcia/samples/25th_min.jpeg', '/home/ash/Desktop/acads/pcia/sam_color_analysis.png', '/home/ash/Desktop/acads/pcia/sam_segmentation_viz.png')
+extract_and_plot_sam(
+    os.path.join(SAMPLES_DIR, '25th_min.jpeg'),
+    os.path.join(RESULTS_DIR, 'sam_color_analysis.png'),
+    os.path.join(RESULTS_DIR, 'sam_segmentation_viz.png')
+)

@@ -1,8 +1,15 @@
 import cv2
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SAMPLES_DIR = os.path.join(BASE_DIR, 'samples')
+RESULTS_DIR = os.path.join(BASE_DIR, 'results', 'temporal')
 
 def extract_and_plot_colors(image_path, output_plot_path):
     image = cv2.imread(image_path)
@@ -26,7 +33,7 @@ def extract_and_plot_colors(image_path, output_plot_path):
     y_peaks, y_props = find_peaks(row_sums, distance=50, prominence=row_sums.max()*0.2)
     x_peaks, x_props = find_peaks(col_sums, distance=50, prominence=col_sums.max()*0.2)
 
-    radius = 32 # Increased to match sample size accurately
+    radius = 32
     
     if len(y_peaks) >= 3 and len(x_peaks) >= 9:
         if len(y_peaks) > 3:
@@ -66,14 +73,13 @@ def extract_and_plot_colors(image_path, output_plot_path):
                             'V_median': np.median(hsv_pixels[:, 2])
                         })
 
-        cv2.imwrite('/home/ash/Desktop/acads/pcia/baseline_grid_detections.png', out_img)
+        cv2.imwrite(os.path.join(RESULTS_DIR, 'baseline_grid_detections.png'), out_img)
 
         df = pd.DataFrame(data)
         col_avg = df.groupby('Column').mean().reset_index()
 
         fig, axes = plt.subplots(3, 1, figsize=(10, 15), sharex=True)
         
-        # RGB Medians
         axes[0].plot(col_avg['Column'], col_avg['R_median'], marker='o', color='red', linestyle='--', label='R (median)')
         axes[0].plot(col_avg['Column'], col_avg['G_median'], marker='o', color='green', linestyle='--', label='G (median)')
         axes[0].plot(col_avg['Column'], col_avg['B_median'], marker='o', color='blue', linestyle='--', label='B (median)')
@@ -82,7 +88,6 @@ def extract_and_plot_colors(image_path, output_plot_path):
         axes[0].legend()
         axes[0].grid(True, alpha=0.3)
 
-        # LAB Medians
         axes[1].plot(col_avg['Column'], col_avg['L_median'], marker='o', color='black', linestyle='--', label='L* (median)')
         axes[1].plot(col_avg['Column'], col_avg['A_median'], marker='o', color='magenta', linestyle='--', label='a* (median)')
         axes[1].plot(col_avg['Column'], col_avg['B_lab_median'], marker='o', color='orange', linestyle='--', label='b* (median)')
@@ -91,7 +96,6 @@ def extract_and_plot_colors(image_path, output_plot_path):
         axes[1].legend()
         axes[1].grid(True, alpha=0.3)
 
-        # HSV Medians
         axes[2].plot(col_avg['Column'], col_avg['H_median'], marker='o', color='cyan', linestyle='--', label='Hue (median)')
         axes[2].plot(col_avg['Column'], col_avg['S_median'], marker='o', color='gray', linestyle='--', label='Sat (median)')
         axes[2].plot(col_avg['Column'], col_avg['V_median'], marker='o', color='purple', linestyle='--', label='Val (median)')
@@ -106,4 +110,7 @@ def extract_and_plot_colors(image_path, output_plot_path):
         plt.savefig(output_plot_path)
         print(f"Saved comparison plot to {output_plot_path}")
 
-extract_and_plot_colors('/home/ash/Desktop/acads/pcia/samples/25th_min.jpeg', '/home/ash/Desktop/acads/pcia/baseline_color_analysis.png')
+extract_and_plot_colors(
+    os.path.join(SAMPLES_DIR, '25th_min.jpeg'),
+    os.path.join(RESULTS_DIR, 'baseline_color_analysis.png')
+)

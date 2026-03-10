@@ -1,15 +1,21 @@
 import cv2
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
 import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SAMPLES_DIR = os.path.join(BASE_DIR, 'samples')
+RESULTS_DIR = os.path.join(BASE_DIR, 'results', 'temporal')
 
 def analyze_temporal_images(image_prefix="th_min.jpeg", timepoints=[0, 5, 10, 15, 20, 25]):
     all_data = []
 
     for t in timepoints:
-        image_path = f"/home/ash/Desktop/acads/pcia/samples/{t}{image_prefix}"
+        image_path = os.path.join(SAMPLES_DIR, f"{t}{image_prefix}")
         if not os.path.exists(image_path):
             print(f"Warning: Could not find image {image_path}. Skipping.")
             continue
@@ -35,7 +41,6 @@ def analyze_temporal_images(image_prefix="th_min.jpeg", timepoints=[0, 5, 10, 15
         y_peaks, y_props = find_peaks(row_sums, distance=50, prominence=row_sums.max()*0.2)
         x_peaks, x_props = find_peaks(col_sums, distance=50, prominence=col_sums.max()*0.2)
         
-        # Heuristic to find the best 3 rows and 9 columns
         if len(y_peaks) >= 3 and len(x_peaks) >= 9:
             if len(y_peaks) > 3:
                 idx = np.argsort(y_props['prominences'])[-3:]
@@ -74,23 +79,19 @@ def analyze_temporal_images(image_prefix="th_min.jpeg", timepoints=[0, 5, 10, 15
         else:
             print(f"Error: Grid tracking failed for {image_path}")
 
-    # Aggregate by timepoint and column
     df = pd.DataFrame(all_data)
     if df.empty:
         print("No data extracted.")
         return
 
-    # Averages across rows for each column at each timepoint
     grouped_df = df.groupby(['Time', 'Column']).mean().reset_index()
 
-    # Plot temporal trends per column
     fig, axes = plt.subplots(3, 3, figsize=(15, 12), sharex=True)
     fig.suptitle('Temporal Colorimetric Trajectories by Column', fontsize=16)
 
     columns_to_plot = sorted(grouped_df['Column'].unique())
     colors = plt.cm.viridis(np.linspace(0, 1, len(columns_to_plot)))
     
-    # Store standard labels 
     channels = [
         ('R_median', 'Red Intensity', axes[0, 0]),
         ('G_median', 'Green Intensity', axes[0, 1]),
@@ -111,22 +112,20 @@ def analyze_temporal_images(image_prefix="th_min.jpeg", timepoints=[0, 5, 10, 15
             ax.set_title(title)
             ax.grid(True, alpha=0.3)
             
-            # Subplot aesthetic cleanup
             if ax in [axes[2, 0], axes[2, 1], axes[2, 2]]:
                 ax.set_xlabel('Time (mins)')
 
-    # Add legend to the last plot cleanly
     handles, labels = axes[0,0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower right', bbox_to_anchor=(0.95, 0.05), ncol=7)
 
-    plt.tight_layout(rect=[0, 0.08, 1, 0.96]) # Leave room for suptitle and legend
-    output_plot_path = '/home/ash/Desktop/acads/pcia/temporal_color_trends.png'
+    plt.tight_layout(rect=[0, 0.08, 1, 0.96])
+    output_plot_path = os.path.join(RESULTS_DIR, 'temporal_color_trends.png')
     plt.savefig(output_plot_path)
     print(f"Saved temporal trends to {output_plot_path}")
 
-    # Optionally dump to CSV
-    df.to_csv('/home/ash/Desktop/acads/pcia/temporal_data.csv', index=False)
-    print("Saved temporal_data.csv")
+    csv_path = os.path.join(RESULTS_DIR, 'temporal_data.csv')
+    df.to_csv(csv_path, index=False)
+    print(f"Saved {csv_path}")
 
 if __name__ == "__main__":
     analyze_temporal_images()
