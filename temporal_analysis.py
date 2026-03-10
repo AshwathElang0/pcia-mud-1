@@ -16,7 +16,7 @@ def analyze_temporal_images(image_prefix="th_min.jpeg", timepoints=[0, 5, 10, 15
 
         print(f"Processing timepoint: {t} mins")
         image = cv2.imread(image_path)
-        
+
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image_lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
         image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -34,7 +34,7 @@ def analyze_temporal_images(image_prefix="th_min.jpeg", timepoints=[0, 5, 10, 15
 
         y_peaks, y_props = find_peaks(row_sums, distance=50, prominence=row_sums.max()*0.2)
         x_peaks, x_props = find_peaks(col_sums, distance=50, prominence=col_sums.max()*0.2)
-        
+
         # Heuristic to find the best 3 rows and 9 columns
         if len(y_peaks) >= 3 and len(x_peaks) >= 9:
             if len(y_peaks) > 3:
@@ -51,11 +51,11 @@ def analyze_temporal_images(image_prefix="th_min.jpeg", timepoints=[0, 5, 10, 15
                     if 0 < c_idx < 8:
                         mask = np.zeros(gray.shape, dtype=np.uint8)
                         cv2.circle(mask, (x, y), radius, 255, -1)
-                        
+
                         rgb_pixels = image_rgb[mask == 255]
                         lab_pixels = image_lab[mask == 255]
                         hsv_pixels = image_hsv[mask == 255]
-                        
+
                         if len(rgb_pixels) > 0:
                             all_data.append({
                                 'Time': t,
@@ -89,8 +89,8 @@ def analyze_temporal_images(image_prefix="th_min.jpeg", timepoints=[0, 5, 10, 15
 
     columns_to_plot = sorted(grouped_df['Column'].unique())
     colors = plt.cm.viridis(np.linspace(0, 1, len(columns_to_plot)))
-    
-    # Store standard labels 
+
+    # Store standard labels
     channels = [
         ('R_median', 'Red Intensity', axes[0, 0]),
         ('G_median', 'Green Intensity', axes[0, 1]),
@@ -105,12 +105,12 @@ def analyze_temporal_images(image_prefix="th_min.jpeg", timepoints=[0, 5, 10, 15
 
     for col, color in zip(columns_to_plot, colors):
         col_data = grouped_df[grouped_df['Column'] == col]
-        
+
         for feature, title, ax in channels:
             ax.plot(col_data['Time'], col_data[feature], marker='o', color=color, label=f'Col {col}')
             ax.set_title(title)
             ax.grid(True, alpha=0.3)
-            
+
             # Subplot aesthetic cleanup
             if ax in [axes[2, 0], axes[2, 1], axes[2, 2]]:
                 ax.set_xlabel('Time (mins)')

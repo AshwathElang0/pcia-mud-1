@@ -10,7 +10,7 @@
 2. **Positive control check**:
    - Do wells WITHOUT antibiotic show obvious color change?
    - If NO → bacterial growth isn't happening at all
-   
+
 3. **Add a metabolic indicator** (if not already present):
    - Resazurin (turns pink when reduced by bacteria)
    - MTT or XTT (turns purple/orange)
@@ -149,7 +149,7 @@ Do the plots show ANY monotonic trends (increasing or decreasing)?
 Are there VISIBLE color differences between t0 and t25?
 │
 ├─ NO → Fix biological assay (Priority 1)
-│   
+│
 └─ YES → Are they consistent across columns?
     │
     ├─ NO → Imaging artifacts (Priority 3)
@@ -194,5 +194,5 @@ If you CAN see a difference:
 
 ---
 
-**Created diagnostic checklist**: `diagnostic_checklist.md`  
+**Created diagnostic checklist**: `diagnostic_checklist.md`
 **Enhanced analysis script**: `enhanced_analysis.py` (already run, see `enhanced_analysis.png`)
