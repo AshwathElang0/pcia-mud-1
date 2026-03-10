@@ -1,6 +1,6 @@
 import pandas as pd
 
-df = pd.read_csv('/home/ash/Desktop/acads/pcia/temporal_data.csv')
+df = pd.read_csv('temporal_data.csv')
 
 # Let's average across the 3 rows
 col_avg = df.groupby(['Time', 'Column']).mean().reset_index()
@@ -20,4 +20,3 @@ print((pivot_R.iloc[-1] - pivot_R.iloc[0]).round(2))
 
 print("\n=== Max A* at t=25 ===")
 print(pivot_A.iloc[-1].round(2))
-

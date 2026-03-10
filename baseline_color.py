@@ -27,7 +27,7 @@ def extract_and_plot_colors(image_path, output_plot_path):
     x_peaks, x_props = find_peaks(col_sums, distance=50, prominence=col_sums.max()*0.2)
 
     radius = 32 # Increased to match sample size accurately
-    
+
     if len(y_peaks) >= 3 and len(x_peaks) >= 9:
         if len(y_peaks) > 3:
             idx = np.argsort(y_props['prominences'])[-3:]
@@ -44,11 +44,11 @@ def extract_and_plot_colors(image_path, output_plot_path):
                 if 0 < c_idx < 8:
                     mask = np.zeros(gray.shape, dtype=np.uint8)
                     cv2.circle(mask, (x, y), radius, 255, -1)
-                    
+
                     rgb_pixels = image_rgb[mask == 255]
                     lab_pixels = image_lab[mask == 255]
                     hsv_pixels = image_hsv[mask == 255]
-                    
+
                     cv2.circle(out_img, (x, y), radius, (0, 255, 0), 4)
 
                     if len(rgb_pixels) > 0:
@@ -66,13 +66,13 @@ def extract_and_plot_colors(image_path, output_plot_path):
                             'V_median': np.median(hsv_pixels[:, 2])
                         })
 
-        cv2.imwrite('/home/ash/Desktop/acads/pcia/baseline_grid_detections.png', out_img)
+        cv2.imwrite('baseline_grid_detections.png', out_img)
 
         df = pd.DataFrame(data)
         col_avg = df.groupby('Column').mean().reset_index()
 
         fig, axes = plt.subplots(3, 1, figsize=(10, 15), sharex=True)
-        
+
         # RGB Medians
         axes[0].plot(col_avg['Column'], col_avg['R_median'], marker='o', color='red', linestyle='--', label='R (median)')
         axes[0].plot(col_avg['Column'], col_avg['G_median'], marker='o', color='green', linestyle='--', label='G (median)')
@@ -106,4 +106,4 @@ def extract_and_plot_colors(image_path, output_plot_path):
         plt.savefig(output_plot_path)
         print(f"Saved comparison plot to {output_plot_path}")
 
-extract_and_plot_colors('/home/ash/Desktop/acads/pcia/samples/25th_min.jpeg', '/home/ash/Desktop/acads/pcia/baseline_color_analysis.png')
+extract_and_plot_colors('samples/25th_min.jpeg', 'baseline_color_analysis.png')

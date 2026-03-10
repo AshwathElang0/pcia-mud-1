@@ -51,7 +51,7 @@ def extract_and_plot_sam(image_path, output_plot_path, viz_path):
 
     input_points = []
     metadata = []
-    
+
     for r_idx, y in enumerate(y_peaks):
         for c_idx, x in enumerate(x_peaks):
             if 0 < c_idx < 8:
@@ -59,27 +59,27 @@ def extract_and_plot_sam(image_path, output_plot_path, viz_path):
                 metadata.append({'Row': r_idx, 'Column': c_idx})
 
     print(f"Generating masks for {len(input_points)} valid sample locations...")
-    
+
     data = []
     viz_img = image.copy()
     viz_mask_overlay = np.zeros_like(image, dtype=np.uint8)
-    
+
     for pt, meta in zip(input_points, metadata):
         inputs = processor(pil_img, input_points=[[[pt]]], return_tensors="pt").to(device)
         with torch.no_grad():
             outputs = model(**inputs)
-        
+
         masks = processor.image_processor.post_process_masks(
             outputs.pred_masks.cpu(), inputs["original_sizes"].cpu(), inputs["reshaped_input_sizes"].cpu()
         )
         scores = outputs.iou_scores.cpu().squeeze()
-        
+
         if len(masks) > 0:
             # masks[0] shape: (1, 3, H, W)
             # We take the mask with the highest IOU score
             best_mask_idx = torch.argmax(scores).item()
             mask = masks[0][0][best_mask_idx].numpy().astype(bool)
-            
+
             # Use a solid, extremely distinct color for all masks (e.g. vibrant magenta)
             color = (255, 0, 255) # BGR
             viz_mask_overlay[mask] = color
@@ -88,7 +88,7 @@ def extract_and_plot_sam(image_path, output_plot_path, viz_path):
             rgb_pixels = image_rgb[mask]
             lab_pixels = image_lab[mask]
             hsv_pixels = image_hsv[mask]
-            
+
             if len(rgb_pixels) > 0:
                 data.append({
                     'Row': meta['Row'],
@@ -115,7 +115,7 @@ def extract_and_plot_sam(image_path, output_plot_path, viz_path):
     col_avg = df.groupby('Column').mean().reset_index()
 
     fig, axes = plt.subplots(3, 1, figsize=(10, 15), sharex=True)
-    
+
     axes[0].plot(col_avg['Column'], col_avg['R_median'], marker='o', color='red', linestyle='--', label='R (median)')
     axes[0].plot(col_avg['Column'], col_avg['G_median'], marker='o', color='green', linestyle='--', label='G (median)')
     axes[0].plot(col_avg['Column'], col_avg['B_median'], marker='o', color='blue', linestyle='--', label='B (median)')
@@ -146,4 +146,4 @@ def extract_and_plot_sam(image_path, output_plot_path, viz_path):
     plt.savefig(output_plot_path)
     print(f"Saved SAM plot to {output_plot_path}")
 
-extract_and_plot_sam('/home/ash/Desktop/acads/pcia/samples/25th_min.jpeg', '/home/ash/Desktop/acads/pcia/sam_color_analysis.png', '/home/ash/Desktop/acads/pcia/sam_segmentation_viz.png')
+extract_and_plot_sam('samples/25th_min.jpeg', 'sam_color_analysis.png', 'sam_segmentation_viz.png')
