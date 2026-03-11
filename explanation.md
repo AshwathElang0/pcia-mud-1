@@ -55,3 +55,12 @@ To validate the reliability of this colorimetric capture method in uncontrolled 
 
 - **Coefficient of Variation (CV%):** We calculate the standard deviation expressed as a percentage of the mean ($\sigma / \mu \times 100$) across the 3 spatially distinct row replicates for every single column at every single timepoint. 
 - **Insight:** High CV% localized to specific columns signals experimental noise (e.g. pipetting discrepancies, edge-effect evaporation). Plotting CV% verifies our analytical baseline and ensures outlier artifacts do not invalidate our algorithmic MIC calculations.
+
+## 8. Intra-Disk Region Detection (Spatial Segmentation)
+
+To provide more granular insight into the reaction kinetics, we analyze the spatial distribution of color *within* each sample disk rather than just taking the median value of the whole well. 
+
+- **Pixel Extraction:** For each active sample well, we extract all individual pixels falling within the 32-pixel radius circular mask.
+- **K-Means Spatial Clustering:** We apply K-Means clustering ($K=2$) on the pixels belonging to each disk in the CIELAB color space (focusing strictly on the $a^*$ and $b^*$ color-opponent channels to eliminate lighting/shading artifacts).
+- **Reaction vs. Unreacted Patches:** This clusters the well into 'Reaction Patches' (pink/red areas with higher $a^*$ values) and 'Unreacted Patches' (blue background areas).
+- **Insight:** By plotting the 'Reaction Area %' trajectory across the time series, we gain insights into whether the bacterial metabolism is localized (e.g., bacteria clustered in one quadrant) or uniform across the well. This reveals dynamic spatial patterns that simple median color logic entirely ignores.
