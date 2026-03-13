@@ -30,7 +30,44 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{1. Temporal MIC Identification}
+\begin{frame}{1. Visual Difference Analysis}
+\begin{itemize}
+    \item \textbf{Approach}: Compare first and last frame visually and via absolute difference map.
+    \item \textbf{Reported result}: Mean absolute intensity difference was about 44.
+    \item \textbf{Reported result}: About 4.2 million pixels changed by more than 20 intensity units.
+    \item \textbf{Interpretation}: Visible change exists, and we need the pipelines to convert it into strong biological trend metrics.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{2. Circular ROI Median Color Extraction}
+\begin{itemize}
+    \item \textbf{Approach}: Detect grid peaks, place fixed-radius circular masks, extract median color per well.
+    \item \textbf{Strength}: Robust to outliers compared with mean-based extraction.
+    \item \textbf{Limitation}: Sensitive to misalignment when grid detection or geometry changes.
+    \item \textbf{Result}: Stable replicate behavior (CV roughly 2\% to 9\%), but weak biological separation in $a^*$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{3. Ratio-Normalized Metrics}
+\begin{itemize}
+    \item \textbf{Approach}: Use R/G and A/L ratios to reduce illumination sensitivity.
+    \item \textbf{R/G results}: Mostly small negative shifts; strongest positive shift in one column (+0.0530).
+    \item \textbf{A/L results}: All columns negative (about -0.023 to -0.107).
+    \item \textbf{Interpretation}: Normalization confirms broad brightening effects and weak concentration-ordered biological contrast.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{4. Pinkness Percentile Analysis}
+\begin{itemize}
+    \item \textbf{Approach}: Track upper-tail pink pixels ($A_{\max}$, $A_{p90}$, $A_{p80}$) rather than medians.
+    \item \textbf{Result}: $A_{\max}$ increased in all columns (+4.67 to +11.00).
+    \item \textbf{Result}: $A_{p90}$ increased in all columns (+2.00 to +7.33).
+    \item \textbf{Observation}: Median $a^*$ still showed weak/mixed behavior.
+    \item \textbf{Interpretation}: Changes appear in localized high-intensity regions, not consistently across full well areas.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{5. Temporal MIC Identification}
 \begin{columns}
 \begin{column}{0.5\textwidth}
 \begin{itemize}
@@ -46,7 +83,7 @@
 \end{columns}
 \end{frame}
 
-\begin{frame}{2. Principal Component Analysis (PCA)}
+\begin{frame}{6. Principal Component Analysis (PCA)}
 \begin{columns}
 \begin{column}{0.5\textwidth}
 \begin{itemize}
@@ -61,7 +98,7 @@
 \end{columns}
 \end{frame}
 
-\begin{frame}{3. K-Means Behavioral Clustering}
+\begin{frame}{7. K-Means Behavioral Clustering}
 \begin{columns}
 \begin{column}{0.5\textwidth}
 \begin{itemize}
@@ -82,7 +119,7 @@
 \end{columns}
 \end{frame}
 
-\begin{frame}{4. Early Prediction \& Curvilinear Kinetics}
+\begin{frame}{8. Early Prediction \& Curvilinear Kinetics}
 \begin{itemize}
     \item \textbf{Early Forecasting}: Logistic regression classifier achieved 85.7\% accuracy predicting final MIC outcome at $t=25$ using \textit{only} the initial $t=0$ image.
     \item \textbf{Curvilinear Kinetics}: Extracting $R^2$ exponential decay/growth coefficients using non-linear curve fits to overlying $a^*$ channel datapoints. Provides insight into deceleration rate and specific bacteriostatic/bactericidal mechanism.
@@ -92,7 +129,7 @@
 \includegraphics[width=0.6\textwidth, height=0.4\textheight, keepaspectratio]{results/statistical/kinetics_analysis.png}
 \end{frame}
 
-\begin{frame}{5. Replicate Consistency}
+\begin{frame}{9. Replicate Consistency}
 \begin{columns}
 \begin{column}{0.5\textwidth}
 \begin{itemize}
@@ -108,7 +145,7 @@
 \end{columns}
 \end{frame}
 
-\begin{frame}{6. Intra-Disk Region Detection}
+\begin{frame}{10. Intra-Disk Region Detection}
 \begin{columns}
 \begin{column}{0.4\textwidth}
 \begin{itemize}
@@ -131,6 +168,57 @@
     \item Advanced ML (PCA, K-Means) revealed deeper color channel insights \& non-linear behavioral responses.
     \item Spatial segmentation within discs proves growth is localized before diffusing.
     \item Early prediction models suggest feasibility of significantly reducing required incubation time.
+\end{itemize}
+\end{frame}
+
+% \begin{frame}{Methods Tested (Overview)}
+% \begin{itemize}
+%     \item Circular ROI median extraction from detected well centers.
+%     \item Temporal trend modeling using per-column channel trajectories.
+%     \item Statistical testing ($t_0$ vs $t_{25}$) and slope-based growth classification.
+%     \item Visual change detection using direct image differencing.
+%     \item Illumination-robust metrics (R/G and A/L ratios).
+%     \item Pinkness-focused percentile metrics (max, 90th, 80th percentile in $a^*$).
+%     \item Pilot semantic segmentation (SAM) for improved ROI boundaries.
+% \end{itemize}
+% \end{frame}
+
+% \begin{frame}{Method 2: Temporal Multi-Channel Trend Analysis}
+% \begin{itemize}
+%     \item \textbf{Approach}: Average replicates by column, then track channel evolution from $t_0$ to $t_{25}$.
+%     \item \textbf{Key finding in $a^*$}: Column deltas ranged only from -3.00 to +3.67.
+%     \item \textbf{Key finding in $L^*$}: Much larger changes, +2.67 to +24.33.
+%     \item \textbf{Key finding in R}: -2.33 to +26.00.
+%     \item \textbf{Interpretation}: Brightness/lightness drift dominated over redness signal.
+% \end{itemize}
+% \end{frame}
+
+% \begin{frame}{Method 3: Statistical Significance and MIC Slope Rule}
+% \begin{itemize}
+%     \item \textbf{t-test on $a^*$} ($t_0$ vs $t_{25}$) for each column: all p-values were $> 0.5$ (no significant change).
+%     \item \textbf{Slope classifier threshold}: 0.1 $a^*$ units/min.
+%     \item \textbf{Observed}: Only one column crossed threshold (slope about +0.116); others were non-growth.
+%     \item \textbf{Interpretation}: MIC call is unstable because signal magnitude is close to noise/artifact scale.
+% \end{itemize}
+% \end{frame}
+
+% \begin{frame}{Method 7: SAM-Based Segmentation (Pilot)}
+% \begin{itemize}
+%     \item \textbf{Approach}: Promptable segmentation at well centers to replace fixed circles with mask-based ROIs.
+%     \item \textbf{Goal}: Reduce boundary error and include true well geometry.
+%     \item \textbf{Output}: Segmentation and channel trend visualizations generated for side-by-side inspection.
+%     \item \textbf{Current status}: Promising as a geometric fix, but quantitative superiority over circular ROIs still needs formal benchmarking.
+% \end{itemize}
+% \end{frame}
+
+\begin{frame}{Consolidated Results and Practical Takeaways}
+\begin{itemize}
+    \item \textbf{Main result}: Strong visual change but weak statistically significant $a^*$ trend.
+    \item \textbf{Most likely bottlenecks}: Image acquisition inconsistency, ROI alignment uncertainty, and illumination artifacts (large $L^*$ drift).
+    \item \textbf{Recommendation 1}: Standardize imaging geometry and camera settings across all timepoints.
+    \item \textbf{Recommendation 2}: Validate ROI placement on every frame or switch to segmentation-first extraction.
+    \item \textbf{Recommendation 3}: Keep percentile and ratio metrics as secondary diagnostics.
+    \item \textbf{Recommendation 4}: Extend incubation time and/or strengthen indicator chemistry for larger biological effect size.
 \end{itemize}
 \end{frame}
 
