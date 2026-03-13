@@ -5,8 +5,9 @@
 \usepackage{booktabs}
 
 \title{Colorimetric Analysis Methodology}
-\subtitle{Bacterial-Dye-Antibiotic Arrays}
-\author{}
+\subtitle{Bacterial–Dye–Antibiotic Arrays}
+\author{Ashwath E, Vardhan R\\
+\textbf{Mentors}: Mudrika K, Suhanya D, Sarita C, Soumya J}
 \date{\today}
 
 \begin{document}
@@ -16,18 +17,51 @@
 \begin{frame}{Problem Setup}
 \begin{itemize}
     \item \textbf{Objective}: Extract biological insights from a temporal sequence of colorimetric images ($0^{th}$ min to $25^{th}$ min).
-    \item \textbf{System}: Bacterial-dye-antibiotic arrays (3x9 grid matrix).
+    \item \textbf{System}: Bacterial–dye–antibiotic arrays (3x9 grid matrix).
     \item \textbf{Goal}: Determine the Minimum Inhibitory Concentration (MIC) and understand reaction kinetics.
-    \item \textbf{Indicator}: Biological indicator dye transitions from blue (high $a^*$) to pink (higher $a^*$) as surviving bacteria metabolize it.
+    \item \textbf{Indicator}: Biological indicator dye transitions from blue (high $a^*$) to pink (higher $a^*$) as surviving bacteria reduce it in a redox reaction.
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Literature Survey}
+    \begin{itemize}
+        \item \textbf{Freeze-Dried Cellulose for AST (2026)}
+        \begin{itemize}
+            \item \href{https://pubmed.ncbi.nlm.nih.gov/41537486/}{\textit{Source:} Sarita C, Khandelwal M, Duraiswamy S. Freeze-Dried Bacterial Cellulose-Based Point-of-Care Device for Antibiotic Susceptibility Testing (AST) (2026).}
+            \item \textit{Relevance:} Context, background, need.
+        \end{itemize}
+        \vspace{0.2cm}
+        
+        \item \textbf{Smartphone-Based Concentration Classification}
+        \begin{itemize}
+            \item \href{https://pubs.acs.org/doi/10.1021/acsomega.1c05086}{\textit{Source:} ACS Omega (2021).}
+            \item \textit{Relevance:} Establishes that smartphone images can be used for ``coarse'' classification of chemical concentrations. This validates our approach of using computer vision on simple camera images rather than expensive spectrophotometers.
+        \end{itemize}
+        \vspace{0.2cm}
+        
+        \item \textbf{ML-Assisted Chemiluminescence}
+        \begin{itemize}
+            \item \href{https://www.sciencedirect.com/science/article/pii/S0039914023011979}{\textit{Source:} Talanta (2023).}
+            \item \textit{Relevance:} Highlights the power of Machine Learning (ML) in discriminating subtle signal changes (chemiluminescence) that human eyes might miss. We apply this same logic to subtle color shifts (Purple to Pink).
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
 \begin{frame}{Grid Detection \& Extraction}
+\begin{columns}
+\begin{column}{0.5\textwidth}
 \begin{itemize}
     \item \textbf{Histogram Projection}: Isolate bright sample wells from the dark tray background using grayscale conversion, thresholding, and morphology opening.
     \item \textbf{Peak Finding}: Identify well centers via prominent peaks in projected 1D histograms over X and Y axes.
     \item \textbf{Median Extraction}: Draw a 32-pixel radius circular mask at each identified well location and extract median intensity across RGB, CIELAB ($L^*a^*b^*$), and HSV color spaces.
 \end{itemize}
+\end{column}
+\begin{column}{0.5\textwidth}
+\centering
+\includegraphics[width=\textwidth]{results/algorithmic/baseline_grid_detections.png}
+\includegraphics[width=\textwidth]{results/algorithmic/sam_segmentation_viz.png}
+\end{column}
+\end{columns}
 \end{frame}
 
 \begin{frame}{1. Visual Difference Analysis}
@@ -37,6 +71,8 @@
     \item \textbf{Reported result}: About 4.2 million pixels changed by more than 20 intensity units.
     \item \textbf{Interpretation}: Visible change exists, and we need the pipelines to convert it into strong biological trend metrics.
 \end{itemize}
+\centering
+\includegraphics[width=\textwidth]{results/algorithmic/visual_difference_map.png}
 \end{frame}
 
 \begin{frame}{2. Circular ROI Median Color Extraction}
@@ -48,26 +84,7 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{3. Ratio-Normalized Metrics}
-\begin{itemize}
-    \item \textbf{Approach}: Use R/G and A/L ratios to reduce illumination sensitivity.
-    \item \textbf{R/G results}: Mostly small negative shifts; strongest positive shift in one column (+0.0530).
-    \item \textbf{A/L results}: All columns negative (about -0.023 to -0.107).
-    \item \textbf{Interpretation}: Normalization confirms broad brightening effects and weak concentration-ordered biological contrast.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{4. Pinkness Percentile Analysis}
-\begin{itemize}
-    \item \textbf{Approach}: Track upper-tail pink pixels ($A_{\max}$, $A_{p90}$, $A_{p80}$) rather than medians.
-    \item \textbf{Result}: $A_{\max}$ increased in all columns (+4.67 to +11.00).
-    \item \textbf{Result}: $A_{p90}$ increased in all columns (+2.00 to +7.33).
-    \item \textbf{Observation}: Median $a^*$ still showed weak/mixed behavior.
-    \item \textbf{Interpretation}: Changes appear in localized high-intensity regions, not consistently across full well areas.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{5. Temporal MIC Identification}
+\begin{frame}{3. Temporal MIC Identification}
 \begin{columns}
 \begin{column}{0.5\textwidth}
 \begin{itemize}
@@ -83,19 +100,48 @@
 \end{columns}
 \end{frame}
 
+\begin{frame}{4. Ratio-Normalized Metrics}
+\begin{itemize}
+    \item \textbf{Approach}: Use R/G and A/L ratios to reduce illumination sensitivity.
+    \item \textbf{R/G results}: Mostly small negative shifts; strongest positive shift in one column (+0.0530).
+    \item \textbf{A/L results}: All columns negative (about -0.023 to -0.107).
+    \item \textbf{Interpretation}: Normalization confirms broad brightening effects and weak concentration-ordered biological contrast.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{5. Pinkness Percentile Analysis}
+\begin{itemize}
+    \item \textbf{Approach}: Track upper-tail pink pixels ($a^*_{\max}$, $a^*_{p90}$, $a^*_{p80}$) rather than medians.
+    % \item \textbf{Result}: $A_{\max}$ increased in all columns (+4.67 to +11.00).
+    % \item \textbf{Result}: $A_{p90}$ increased in all columns (+2.00 to +7.33).
+    \item \textbf{Observation}: There is correlation with time, but no correlation with the concentration.
+    \item \textbf{Interpretation}: Changes are visible in each well across time, but not consistently across different wells.
+    \item Also tested with $R$ instead of $a^*$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{5. Pinkness Percentile Analysis Results}
+    \centering
+    \includegraphics[width=\textwidth]{results/algorithmic/pinkness_trends.png}
+\end{frame}
+
+\begin{frame}{5. Pinkness Percentile Analysis Results}
+    \centering
+    \includegraphics[width=\textwidth]{results/algorithmic/pinkness_by_column.png}
+\end{frame}
+
+\begin{frame}{5. Pinkness Percentile Analysis Results}
+    \centering
+    \includegraphics[width=0.8\textwidth]{results/algorithmic/enhanced_analysis.png}
+\end{frame}
+
 \begin{frame}{6. Principal Component Analysis (PCA)}
-\begin{columns}
-\begin{column}{0.5\textwidth}
 \begin{itemize}
     \item \textbf{Purpose}: Dimensionality reduction of 9 distinct color features per sample per timepoint.
     \item \textbf{Inference}: Green (G), Lightness ($L^*$), and Saturation (S) channels carry the highest variance over the temporal sequence, more than traditional red-blue axes.
 \end{itemize}
-\end{column}
-\begin{column}{0.5\textwidth}
 \centering
 \includegraphics[width=\textwidth]{results/statistical/pca_analysis.png}
-\end{column}
-\end{columns}
 \end{frame}
 
 \begin{frame}{7. K-Means Behavioral Clustering}
@@ -130,19 +176,13 @@
 \end{frame}
 
 \begin{frame}{9. Replicate Consistency}
-\begin{columns}
-\begin{column}{0.5\textwidth}
 \begin{itemize}
     \item \textbf{Method}: Calculated Coefficient of Variation (CV\%) across the 3 replicate rows.
     \item \textbf{Inference}: Assay layout is highly stable (CV 2.5\% - 5.5\%).
     \item \textbf{Anomaly}: Column 3 exhibited a variance spike (8.54\% CV), a hallmark of borderline transition to near-lethal antibiotic stresses.
 \end{itemize}
-\end{column}
-\begin{column}{0.5\textwidth}
 \centering
 \includegraphics[width=\textwidth]{results/statistical/replicate_consistency.png}
-\end{column}
-\end{columns}
 \end{frame}
 
 \begin{frame}{10. Intra-Disk Region Detection}
@@ -220,6 +260,14 @@
     \item \textbf{Recommendation 3}: Keep percentile and ratio metrics as secondary diagnostics.
     \item \textbf{Recommendation 4}: Extend incubation time and/or strengthen indicator chemistry for larger biological effect size.
 \end{itemize}
+\end{frame}
+
+\begin{frame}{Road Ahead}
+    \begin{itemize}
+        \item Reassess the validity and repeatability of the experiment with the mentors.
+        \item Investigate the biology (eg. mode of action of the antibiotic) to model the bacterial–dye–antibiotic interaction as a reaction.
+        \item Test hybrid methods.
+    \end{itemize}
 \end{frame}
 
 \end{document}
