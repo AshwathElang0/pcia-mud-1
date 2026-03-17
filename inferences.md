@@ -34,3 +34,13 @@ We analyzed the Coefficient of Variation (CV%) across the 3 replicate rows for e
 By applying K-Means clustering spatially *within* the pixels of individual sample wells, we isolated the "Reacted" (pink) blobs from the "Unreacted" (blue) background.
 - **Inference:** Growth does not occur as a perfectly uniform color fade across the well. In active growth columns (like Col 6), the **Area Percentage** of the pink blobs expands non-linearly over time relative to the blue background. 
 - **Application:** This means bacterial colonies are metabolizing locally and creating localized diffusion gradients of reduced dye. Tracking the *spatial area expansion* of these regions is potentially a more robust metric for early growth detection than simply tracking the average median color of the entire well.
+
+## 7. Consensus Stability (Smart Replicate Refinement)
+By applying outlier detection to our replicates, we identified that **Row 1 of Column 7** was a significant statistical outlier (Euclidean trajectory distance >43).
+- **Inference:** Dropping this outlier row resulted in a much cleaner, monotonic trend for the inhibited columns. 
+- **Application:** Most computer-vision assays fail due to single-well artifacts. By using trajectory-based consensus, we can automatically "clean" the data to ensure the final MIC report is based on consistent biological evidence rather than averaged noise.
+
+## 8. Radial Gradient Signatures
+The radial profiling of Column 6 (active growth) reveals an **"Inside-Out" reaction pattern**. 
+- **Inference:** The $a^*$ values in the innermost rings (0-1) increased faster and reached higher final magnitudes than the outer rings (3-4). 
+- **Application:** This spatial signature suggests that the metabolic consumption of the dye is most intense at the core of the well, likely due to higher cell density or better dye accessibility at the center, rather than oxygen diffusion limits which would have caused an "Outside-In" pattern.
