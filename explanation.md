@@ -64,3 +64,20 @@ To provide more granular insight into the reaction kinetics, we analyze the spat
 - **K-Means Spatial Clustering:** We apply K-Means clustering ($K=2$) on the pixels belonging to each disk in the CIELAB color space (focusing strictly on the $a^*$ and $b^*$ color-opponent channels to eliminate lighting/shading artifacts).
 - **Reaction vs. Unreacted Patches:** This clusters the well into 'Reaction Patches' (pink/red areas with higher $a^*$ values) and 'Unreacted Patches' (blue background areas).
 - **Insight:** By plotting the 'Reaction Area %' trajectory across the time series, we gain insights into whether the bacterial metabolism is localized (e.g., bacteria clustered in one quadrant) or uniform across the well. This reveals dynamic spatial patterns that simple median color logic entirely ignores.
+
+## 9. Smart Replicate Selection (Outlier-Aware Aggregation)
+
+To ensure that the column-wise trends are not skewed by anomalous replicates, we implemented a consensus-based filtering algorithm.
+
+- **Trajectory Comparison:** For each column, we extract the full 25-minute `a*` trajectory for each of the three replicate rows.
+- **Euclidean Distance Ranking:** We calculate the pairwise Euclidean distance between these trajectories.
+- **Consensus Filtering:** If a row's distance from the others is significantly higher than the baseline variance, it is flagged as a heterogeneous outlier and discarded from the final aggregation.
+- **Benefit:** This produces a "best-of" consolidated trend that is significantly more stable and robust against experimental artifacts like single-well pipetting errors or localized glare.
+
+## 10. Radial Color Profiling (Spatial Gradients)
+
+This method moves beyond holistic disk analysis by studying the well as a set of concentric zones.
+
+- **Concentric Annuli:** We divide each 32-pixel radius well into 5 concentric rings (from Center to Periphery).
+- **Radial Heatmapping:** We track the color shift ($a^*$ and $L^*$) within each ring independently across time.
+- **Insight:** This reveals the directionality of the reaction. For instance, detecting that $a^*$ values increase faster in the outer rings than the center can signify oxygen-dependent metabolism or diffusion-limited kinetics, which is a key signature in clinical microbiology.
