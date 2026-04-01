@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 import pandas as pd
+from scipy.spatial.distance import jensenshannon
+from scipy.stats import ks_2samp
 import matplotlib.pyplot as plt
 import os
 from glob import glob
@@ -81,6 +83,10 @@ row_medians_over_time = {0: [], 1: []}  # R channel
 row_medians_a_over_time = {0: [], 1: []}  # a* channel
 
 
+
+SAM_MASKS_DIR = os.path.join(RESULTS_DIR, 'sam_masks')
+os.makedirs(SAM_MASKS_DIR, exist_ok=True)
+
 for img_path in image_files:
     img = cv2.imread(img_path)
     if img is None:
@@ -93,6 +99,18 @@ for img_path in image_files:
     else:
         masks = detect_samples_sam(img_rgb)
         np.save(mask_path, masks)
+    # --- Plot and save mask overlay for visual verification ---
+    mask_overlay = img_rgb.copy()
+    for r in range(N_ROWS):
+        for c in range(N_COLS):
+            mask = masks[r, c]
+            color = (255, 0, 255) if r == 0 else (0, 255, 255)
+            mask_overlay[mask] = (0.5 * mask_overlay[mask] + 0.5 * np.array(color)).astype(np.uint8)
+    mask_overlay_bgr = cv2.cvtColor(mask_overlay, cv2.COLOR_RGB2BGR)
+    out_mask_name = os.path.splitext(os.path.basename(img_path))[0] + '_sam_overlay.png'
+    out_mask_path = os.path.join(SAM_MASKS_DIR, out_mask_name)
+    cv2.imwrite(out_mask_path, mask_overlay_bgr)
+    # --- End mask overlay ---
     sample_means = np.zeros((N_ROWS, N_COLS, 3))
     sample_medians = np.zeros((N_ROWS, N_COLS, 3))
     for r in range(N_ROWS):
@@ -122,6 +140,11 @@ row_variances_median[1] = np.array(row_variances_median[1])[sorted_idx]
 
 
 # --- Plot KDEs for a* values of both rows (before normalization) ---
+
+# --- KDE output folder ---
+KDE_DIR = os.path.join(RESULTS_DIR, 'kde')
+os.makedirs(KDE_DIR, exist_ok=True)
+
 plt.figure(figsize=(12,6))
 for r in range(N_ROWS):
     handles = []
@@ -137,7 +160,7 @@ for r in range(N_ROWS):
     plt.ylabel('Density')
     plt.legend(handles=handles, labels=labels, title='Timepoints', bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.tight_layout(rect=[0,0,0.85,1])
-    plt.savefig(os.path.join(RESULTS_DIR, f'row{r}_a_distribution_over_time.png'))
+    plt.savefig(os.path.join(KDE_DIR, f'row{r}_a_distribution_over_time.png'))
     plt.clf()
 
 
@@ -162,6 +185,7 @@ norm_dye_a = np.array(norm_dye_a)
 norm_bacteria_a = np.array(norm_bacteria_a)
 
 # --- Plot normalized KDEs for both rows ---
+
 plt.figure(figsize=(12,6))
 for r, norm_data in zip([0,1], [norm_dye_a, norm_bacteria_a]):
     handles = []
@@ -177,11 +201,16 @@ for r, norm_data in zip([0,1], [norm_dye_a, norm_bacteria_a]):
     plt.ylabel('Density')
     plt.legend(handles=handles, labels=labels, title='Timepoints', bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.tight_layout(rect=[0,0,0.85,1])
-    plt.savefig(os.path.join(RESULTS_DIR, f'row{r}_a_distribution_over_time_normalized.png'))
+    plt.savefig(os.path.join(KDE_DIR, f'row{r}_a_distribution_over_time_normalized.png'))
     plt.clf()
 
 
 # --- Plot both rows' a* medians (unnormalized) on the same scatter plot ---
+
+# --- Scatter output folder ---
+SCATTER_DIR = os.path.join(RESULTS_DIR, 'scatter')
+os.makedirs(SCATTER_DIR, exist_ok=True)
+
 plt.figure(figsize=(10,6))
 for r, label, marker in zip([0,1], ['Dye row', 'Bacteria row'], ['o', 's']):
     for i, t in enumerate(timepoints):
@@ -191,7 +220,7 @@ plt.xlabel('Time (min)')
 plt.ylabel('a* value')
 plt.legend(loc='best', fontsize='small')
 plt.tight_layout()
-plt.savefig(os.path.join(RESULTS_DIR, 'both_rows_a_scatter.png'))
+plt.savefig(os.path.join(SCATTER_DIR, 'both_rows_a_scatter.png'))
 plt.close()
 
 # --- Plot both rows' a* medians (normalized) on the same scatter plot ---
@@ -205,7 +234,7 @@ plt.xlabel('Time (min)')
 plt.ylabel('Normalized a* value')
 plt.legend(loc='best', fontsize='small')
 plt.tight_layout()
-plt.savefig(os.path.join(RESULTS_DIR, 'both_rows_a_scatter_normalized.png'))
+plt.savefig(os.path.join(SCATTER_DIR, 'both_rows_a_scatter_normalized.png'))
 plt.close()
 
 # --- Plot just the unnormalized a* values of the bacteria row (all timepoints as scatter) ---
@@ -216,31 +245,104 @@ plt.title('Unnormalized Bacteria Row a* Medians (Scatter)')
 plt.xlabel('Time (min)')
 plt.ylabel('a* value')
 plt.tight_layout()
-plt.savefig(os.path.join(RESULTS_DIR, 'bacteria_row_a_scatter.png'))
+plt.savefig(os.path.join(SCATTER_DIR, 'bacteria_row_a_scatter.png'))
+plt.close()
+# --- Statistical summary CSV ---
+summary_rows = []
+for r in range(N_ROWS):
+    for i, t in enumerate(timepoints):
+        vals = np.array(row_medians_a_over_time[r][i])
+        summary_rows.append({
+            'row': r,
+            'time': t,
+            'mean': np.nanmean(vals),
+            'median': np.nanmedian(vals),
+            'std': np.nanstd(vals),
+            'iqr': np.nanpercentile(vals, 75) - np.nanpercentile(vals, 25)
+        })
+summary_df = pd.DataFrame(summary_rows)
+
+# Save summary CSV in csv folder
+CSV_DIR = os.path.join(RESULTS_DIR, 'csv')
+os.makedirs(CSV_DIR, exist_ok=True)
+summary_df.to_csv(os.path.join(CSV_DIR, 'a_medians_summary.csv'), index=False)
+
+# --- Visualize summary CSV ---
+plt.figure(figsize=(10,6))
+for stat in ['mean', 'median', 'std', 'iqr']:
+    for r, label in zip([0,1], ['Dye row', 'Bacteria row']):
+        plt.plot(summary_df[summary_df['row']==r]['time'], summary_df[summary_df['row']==r][stat], marker='o', label=f'{label} {stat}')
+plt.xlabel('Time (min)')
+plt.ylabel('Value')
+plt.title('Summary Statistics of a* Medians')
+plt.legend()
+plt.tight_layout()
+plt.savefig(os.path.join(CSV_DIR, 'a_medians_summary_stats.png'))
 plt.close()
 
-plt.figure(figsize=(12,6))
-
+# --- Jensen-Shannon Distance (JSD) tracking between consecutive timepoints ---
+JSD_DIR = os.path.join(RESULTS_DIR, 'jsd')
+os.makedirs(JSD_DIR, exist_ok=True)
+def kde_to_prob(vals, bins):
+    vals = np.asarray(vals)
+    vals = vals[np.isfinite(vals)]
+    if vals.size == 0:
+        return np.ones(len(bins) - 1) / (len(bins) - 1)
+    hist, _ = np.histogram(vals, bins=bins, density=False)
+    hist = hist.astype(float) + 1e-8
+    return hist / hist.sum()
+bins = np.linspace(-128, 128, 30)
+jsd_rows = []
 for r in range(N_ROWS):
-    data = row_medians_over_time[r]
-    handles = []
-    labels = []
-    for i, t in enumerate(timepoints):
-        label = f'Time {t} min'
-        color = f'C{i}'  # Use matplotlib color cycle for distinction
-        kde = sns.kdeplot(data[i], label=label, bw_adjust=0.5, alpha=0.5, fill=True, clip=(0,255),
-                         color=color, lw=1)
-        # Only add to legend if a line was drawn
-        if kde.lines:
-            handles.append(kde.lines[-1])
-            labels.append(label)
-    plt.title(f'Distribution of Disk R-channel Medians (Row {r}, Dye=0, Bacteria=1)')
-    plt.xlabel('Median R value')
-    plt.ylabel('Density')
-    plt.legend(handles=handles, labels=labels, title='Timepoints', bbox_to_anchor=(1.05, 1), loc='upper left')
-    plt.tight_layout(rect=[0,0,0.85,1])
-    plt.savefig(os.path.join(RESULTS_DIR, f'row{r}_medianR_distribution_over_time.png'))
-    plt.clf()
+    for i in range(1, len(timepoints)):
+        pk = kde_to_prob(row_medians_a_over_time[r][i-1], bins)
+        qk = kde_to_prob(row_medians_a_over_time[r][i], bins)
+        jsd = jensenshannon(pk, qk)
+        jsd_rows.append({'row': r, 't1': timepoints[i-1], 't2': timepoints[i], 'jsd': jsd})
+jsd_df = pd.DataFrame(jsd_rows)
+jsd_df.to_csv(os.path.join(JSD_DIR, 'jsd_over_time.csv'), index=False)
+plt.figure(figsize=(8,5))
+for r, label in zip([0,1], ['Dye row', 'Bacteria row']):
+    plt.plot(jsd_df[jsd_df['row']==r]['t2'], jsd_df[jsd_df['row']==r]['jsd'], marker='o', label=label)
+plt.xlabel('Time (min)')
+plt.ylabel('Jensen-Shannon Distance')
+plt.title('JSD Between Consecutive Timepoints')
+plt.legend()
+plt.tight_layout()
+plt.savefig(os.path.join(JSD_DIR, 'jsd_over_time.png'))
+plt.close()
 
-print('Variance plot (SAM) saved to', os.path.join(RESULTS_DIR, 'control_variance_over_time_sam.png'))
-print('Distribution plots saved to', os.path.join(RESULTS_DIR, 'row0_medianR_distribution_over_time.png'), 'and row1_medianR_distribution_over_time.png')
+# --- Hypothesis tests (KS test) between consecutive timepoints ---
+HYP_DIR = os.path.join(RESULTS_DIR, 'hypothesis')
+os.makedirs(HYP_DIR, exist_ok=True)
+ks_rows = []
+for r in range(N_ROWS):
+    for i in range(1, len(timepoints)):
+        stat, pval = ks_2samp(row_medians_a_over_time[r][i-1], row_medians_a_over_time[r][i])
+        ks_rows.append({'row': r, 't1': timepoints[i-1], 't2': timepoints[i], 'ks_stat': stat, 'ks_pval': pval})
+ks_df = pd.DataFrame(ks_rows)
+ks_df.to_csv(os.path.join(HYP_DIR, 'ks_over_time.csv'), index=False)
+plt.figure(figsize=(8,5))
+for r, label in zip([0,1], ['Dye row', 'Bacteria row']):
+    plt.plot(ks_df[ks_df['row']==r]['t2'], ks_df[ks_df['row']==r]['ks_stat'], marker='o', label=f'{label} KS stat')
+plt.xlabel('Time (min)')
+plt.ylabel('KS Statistic')
+plt.title('KS Statistic Between Consecutive Timepoints')
+plt.legend()
+plt.tight_layout()
+plt.savefig(os.path.join(HYP_DIR, 'ks_stat_over_time.png'))
+plt.close()
+plt.figure(figsize=(8,5))
+for r, label in zip([0,1], ['Dye row', 'Bacteria row']):
+    plt.plot(ks_df[ks_df['row']==r]['t2'], ks_df[ks_df['row']==r]['ks_pval'], marker='o', label=f'{label} KS p-value')
+plt.xlabel('Time (min)')
+plt.ylabel('KS p-value')
+plt.title('KS p-value Between Consecutive Timepoints')
+plt.legend()
+plt.tight_layout()
+plt.savefig(os.path.join(HYP_DIR, 'ks_pval_over_time.png'))
+plt.close()
+
+print('Saved summary CSV/plot in', CSV_DIR)
+print('Saved JSD tracking in', JSD_DIR)
+print('Saved KS hypothesis outputs in', HYP_DIR)
