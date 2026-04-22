@@ -8,8 +8,8 @@ import torch
 from transformers import SamModel, SamProcessor
 from PIL import Image
 
-CONTROL_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'samples', 'control')
-RESULTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'results', 'statistical')
+CONTROL_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'samples', 'well_plate')
+RESULTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'results', 'statistical', 'well_plate')
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
 image_files = sorted(glob(os.path.join(CONTROL_DIR, '*.png')))

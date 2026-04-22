@@ -18,13 +18,34 @@ IMG_FILES = [f"{t}th_min.jpeg" for t in TIMEPOINTS]
 
 # Detection parameters (tuned for these images)
 MIN_RADIUS = 15
-MAX_RADIUS = 60
+MAX_RADIUS = 40
 
 
 def detect_disks(image_rgb):
     gray = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2GRAY)
     gray_blur = cv2.medianBlur(gray, 7)
-    circles = cv2.HoughCircles(
+
+    lab = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2LAB)
+    l_chan = lab[:, :, 0]
+    a_chan = lab[:, :, 1]
+
+    # Blend luminance with red-green opponency to boost very light pink wells.
+    l_norm = cv2.normalize(l_chan, None, 0, 255, cv2.NORM_MINMAX)
+    a_norm = cv2.normalize(a_chan, None, 0, 255, cv2.NORM_MINMAX)
+    pink_emphasis = cv2.addWeighted(l_norm, 0.05, a_norm, 0.80, 0)
+    pink_emphasis_blur = cv2.GaussianBlur(pink_emphasis, (7, 7), 0)
+
+    circles_pink = cv2.HoughCircles(
+        pink_emphasis_blur,
+        cv2.HOUGH_GRADIENT,
+        dp=1.3,
+        minDist=42,
+        param1=90,
+        param2=35,
+        minRadius=MIN_RADIUS,
+        maxRadius=MAX_RADIUS,
+    )
+    circles_gray = cv2.HoughCircles(
         gray_blur,
         cv2.HOUGH_GRADIENT,
         dp=1.3,
@@ -34,10 +55,20 @@ def detect_disks(image_rgb):
         minRadius=MIN_RADIUS,
         maxRadius=MAX_RADIUS,
     )
+
+    candidate_circles = []
+    for circles in (circles_pink, circles_gray):
+        if circles is not None:
+            candidate_circles.extend(np.round(circles[0, :]).astype("int"))
+
     disks = []
-    if circles is not None:
-        circles = np.round(circles[0, :]).astype("int")
-        for x, y, r in circles:
+    for x, y, r in candidate_circles:
+        is_duplicate = False
+        for ex, ey, er in disks:
+            if (x - ex) ** 2 + (y - ey) ** 2 <= (0.45 * (r + er)) ** 2:
+                is_duplicate = True
+                break
+        if not is_duplicate:
             disks.append((int(x), int(y), int(r)))
     return disks
 
