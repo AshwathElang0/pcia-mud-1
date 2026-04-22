@@ -111,23 +111,30 @@ for img_path in image_files:
     out_mask_path = os.path.join(SAM_MASKS_DIR, out_mask_name)
     cv2.imwrite(out_mask_path, mask_overlay_bgr)
     # --- End mask overlay ---
-    sample_means = np.zeros((N_ROWS, N_COLS, 3))
-    sample_medians = np.zeros((N_ROWS, N_COLS, 3))
+    img_lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+    sample_means_rgb = np.zeros((N_ROWS, N_COLS, 3))
+    sample_medians_rgb = np.zeros((N_ROWS, N_COLS, 3))
+    sample_medians_lab = np.zeros((N_ROWS, N_COLS, 3))
+    
     for r in range(N_ROWS):
         for c in range(N_COLS):
             mask = masks[r, c]
-            pixels = img_rgb[mask]
-            if len(pixels) > 0:
-                sample_means[r, c] = np.mean(pixels, axis=0)
-                sample_medians[r, c] = np.median(pixels, axis=0)
+            pixels_rgb = img_rgb[mask]
+            pixels_lab = img_lab[mask]
+            if len(pixels_rgb) > 0:
+                sample_means_rgb[r, c] = np.mean(pixels_rgb, axis=0)
+                sample_medians_rgb[r, c] = np.median(pixels_rgb, axis=0)
+                sample_medians_lab[r, c] = np.median(pixels_lab, axis=0)
             else:
-                sample_means[r, c] = np.nan
-                sample_medians[r, c] = np.nan
+                sample_means_rgb[r, c] = np.nan
+                sample_medians_rgb[r, c] = np.nan
+                sample_medians_lab[r, c] = np.nan
+                
     for r in range(N_ROWS):
-        row_medians_over_time[r].append(sample_medians[r,:,0].copy())  # R channel
-        row_medians_a_over_time[r].append(sample_medians[r,:,1].copy())  # a* channel
-        row_variances_mean[r].append(np.nanvar(sample_means[r], axis=0).mean())
-        row_variances_median[r].append(np.nanvar(sample_medians[r], axis=0).mean())
+        row_medians_over_time[r].append(sample_medians_rgb[r,:,0].copy())  # R channel
+        row_medians_a_over_time[r].append(sample_medians_lab[r,:,1].copy())  # a* channel (index 1 in Lab)
+        row_variances_mean[r].append(np.nanvar(sample_means_rgb[r], axis=0).mean())
+        row_variances_median[r].append(np.nanvar(sample_medians_rgb[r], axis=0).mean())
     t = extract_time(img_path)
     timepoints.append(t)
 
