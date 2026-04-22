@@ -89,12 +89,21 @@ def main():
     
     # 1. Pinkness over Time (per Concentration)
     plt.figure(figsize=(12, 7))
-    # Filter for Row 1 and Row 2 to plot as separate lines if needed, or grouped
+    # We convert Concentration to string to ensure the legend shows the exact values
+    # instead of a continuous scale interpolation.
+    df_plot = df.copy()
+    df_plot["Concentration_str"] = df_plot["Concentration"].astype(str)
+    
+    # Sort concentration labels numerically for the legend
+    sorted_concs = sorted(df["Concentration"].unique(), reverse=True)
+    hue_order = [str(c) for c in sorted_concs]
+
     sns.lineplot(
-        data=df, 
+        data=df_plot, 
         x="Time", 
         y="Pinkness", 
-        hue="Concentration", 
+        hue="Concentration_str", 
+        hue_order=hue_order,
         style="Row", 
         palette="flare", 
         markers=True,
@@ -123,6 +132,11 @@ def main():
         dashes=False
     )
     plt.xscale("log")
+    
+    # Set explicit x-ticks to show the actual concentrations
+    xticks = CONCENTRATIONS
+    plt.xticks(xticks, labels=[str(x) for x in xticks])
+    
     plt.title("Pinkness vs. Concentration Across Time Points")
     plt.ylabel("Pinkness (CIE a* channel value)")
     plt.xlabel("Concentration (ug/mL) - Log Scale")

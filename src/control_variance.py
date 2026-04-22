@@ -343,6 +343,24 @@ plt.tight_layout()
 plt.savefig(os.path.join(HYP_DIR, 'ks_pval_over_time.png'))
 plt.close()
 
+# --- Empirical Cumulative Distribution Function (ECDF) plots ---
+ECDF_DIR = os.path.join(RESULTS_DIR, 'ecdf')
+os.makedirs(ECDF_DIR, exist_ok=True)
+
+for r in range(N_ROWS):
+    plt.figure(figsize=(10,6))
+    for i, t in enumerate(timepoints):
+        sns.ecdfplot(row_medians_a_over_time[r][i], label=f'Time {t} min', color=f'C{i}', lw=2)
+    plt.title(f'Row {r} a* ECDF Over Time')
+    plt.xlabel('a* value')
+    plt.ylabel('Cumulative Probability')
+    plt.legend(title='Timepoints', bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(os.path.join(ECDF_DIR, f'row{r}_a_ecdf_over_time.png'))
+    plt.close()
+
 print('Saved summary CSV/plot in', CSV_DIR)
 print('Saved JSD tracking in', JSD_DIR)
 print('Saved KS hypothesis outputs in', HYP_DIR)
+print('Saved ECDF plots in', ECDF_DIR)
