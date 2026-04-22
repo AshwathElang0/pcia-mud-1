@@ -1,0 +1,112 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{subcaption}
+\usepackage{url}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{AI-Assisted Colorimetric Analysis for Antibiotic Susceptibility Testing: A Computer Vision Approach}
+
+\author{
+  \IEEEauthorblockN{Ashwath}
+  \IEEEauthorblockA{\textit{Dept. of Artificial Intelligence} \\
+  \textit{IIT Hyderabad}\\
+  Hyderabad, India}
+  \and
+  \IEEEauthorblockN{Vardhan}
+  \IEEEauthorblockA{\textit{Dept. of Engineering Science} \\
+  \textit{IIT Hyderabad}\\
+  Hyderabad, India}
+}
+
+\maketitle
+
+\begin{abstract}
+Standard Antibiotic Susceptibility Testing (AST) is often hindered by the high cost of microplate readers, particularly in resource-limited settings. In this work, we propose a cost-effective alternative using computer vision and smartphone-based image acquisition. By utilizing the Resazurin colorimetric indicator, which shifts from blue/purple to pink (Resorufin) in the presence of bacterial metabolic activity, we develop a robust analytical pipeline. Our approach combines Signal-Guided Machine Learning (ML) for fluid segmentation using the Segment Anything Model (SAM) and CIELAB color space quantification for precise tracking of "Pinkness". Statistical distribution analysis via Jensen-Shannon Distance (JSD) and Kolmogorov-Smirnov (KS) tests provides a probabilistic framework for Minimum Inhibitory Concentration (MIC) determination. The results demonstrate that our computer vision-based method effectively tracks bacterial growth inhibition across dilution series, offering a promising path toward decentralized point-of-care diagnostics.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Antibiotic Susceptibility Testing (AST), Resazurin, Computer Vision, SAM, CIELAB, Statistical Analysis, Point-of-Care.
+\end{IEEEkeywords}
+
+\section{Introduction}
+Antibiotic Susceptibility Testing (AST) is critical for determining the Minimum Inhibitory Concentration (MIC) of antibiotics against specific bacterial strains. Traditional methods, while accurate, often rely on expensive equipment such as microplate readers, which can cost upwards of Rs. 10 Lakhs. This financial barrier limits the accessibility of AST in rural and resource-constrained environments.
+
+To address this, colorimetric assays using Resazurin have been developed. Resazurin is a blue non-fluorescent dye that is reduced to pink and highly fluorescent Resorufin by the metabolic activity of living cells. While visual inspection can provide a qualitative assessment, it is subjective and prone to human error.
+
+In this work, we present an automated computer vision pipeline designed to quantify the colorimetric shift in Resazurin-based assays. The goal is to standardize the analysis on vials and well-plates, providing a foundation for transitioning to Freeze-Dried Bacterial Cellulose (FDBC) substrates for rapid, point-of-care diagnostics.
+
+\section{Methodology}
+
+\subsection{Image Acquisition and Pre-processing}
+Images of the experimental setup, consisting of a 2x10 grid of vials, were captured using a smartphone camera. The first row (Row 1) served as a dye control (sterility check), while the second row (Row 2) contained bacteria with a decreasing concentration of antibiotics (128, 64, 32, 16, 8, 4, 2, 1, 0.5, 0.25 $\mu$g/mL).
+
+Pre-processing involved automated grid and circle detection. While Hough Transforms were initially explored, a more robust "Signal-Guided" approach was implemented to handle varying lighting and background conditions.
+
+\subsection{Segmentation: Signal-Guided ML}
+Isolating the fluid regions from the vials is challenging due to reflections and the transparency of the containers. We utilized the **HSV Saturation channel** to generate high-confidence seeds for fluid locations, as the colored fluid typically exhibits higher saturation than the background. 
+
+These seeds were used as prompts for the **Segment Anything Model (SAM)**. By providing SAM with localized point prompts and bounding boxes derived from the saturation peaks, we achieved precise masks for each fluid region, minimizing "leaking" into the container boundaries.
+
+\subsection{Quantification: CIELAB a* Channel}
+To quantify the transition from blue to pink, we transformed the RGB images into the **CIELAB color space**. The **$a^*$ channel**, which represents the green-to-red axis, provides a robust measure of "Pinkness". Unlike RGB or intensity-based measures, the $a^*$ value is relatively independent of brightness, making it ideal for varying lighting environments. The median $a^*$ value within each segmented mask was extracted as the primary analytical metric.
+
+\subsection{Normalization and Statistical Tracking}
+To further mitigate environmental lighting variance, we implemented **layout-based affine normalization**. The $a^*$ values of the bacteria row were normalized using the sterility control row (Row 1).
+
+Statistical significance was assessed using:
+\begin{itemize}
+    \item **Jensen-Shannon Distance (JSD)**: To quantify the divergence between probability distributions of $a^*$ values across timepoints.
+    \item **Kolmogorov-Smirnov (KS) Test**: To determine if the distribution of a sample at time $t$ is significantly different from time $t=0$, indicating growth.
+\end{itemize}
+
+\section{Results}
+
+\subsection{Segmentation Accuracy}
+The Signal-Guided ML approach successfully isolated the fluid regions across all timepoints. Fig. \ref{fig:segmentation} shows the segmentation overlay for the 60-minute mark, demonstrating the precision of the SAM-generated masks.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.48\textwidth]{../results/broth/min60_overlay.png}
+\caption{Segmentation overlay using SAM guided by HSV saturation prompts (60 min).}
+\label{fig:segmentation}
+\end{figure}
+
+\subsection{Growth Kinetics and MIC Determination}
+The "Pinkness" (median $a^*$) was tracked over time for each antibiotic concentration. As shown in Fig. \ref{fig:pinkness}, lower antibiotic concentrations exhibited a rapid increase in $a^*$, corresponding to bacterial growth and Resazurin reduction. Conversely, high concentrations remained relatively flat, indicating inhibition.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.48\textwidth]{../results/analysis/pinkness_over_time.png}
+\caption{Pinkness ($a^*$ channel) evolution over time for different antibiotic concentrations.}
+\label{fig:pinkness}
+\end{figure}
+
+\subsection{Statistical Significance}
+The JSD tracking (Fig. \ref{fig:jsd}) confirms that the distribution shift becomes statistically significant as the experiment progresses. The JSD between the bacteria row and the control row increases over time, providing a clear window for automated decision-making.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.45\textwidth]{../results/statistical/jsd/jsd_over_time.png}
+\caption{Jensen-Shannon Distance (JSD) tracking between consecutive timepoints for control and bacteria rows.}
+\label{fig:jsd}
+\end{figure}
+
+\section{Discussion}
+The proposed computer vision pipeline offers several advantages over traditional microplate readers. First, the use of SAM allows for high-fidelity segmentation without manual tuning of intensity thresholds. Second, the CIELAB $a^*$ channel provides a colorimetric quantification that is robust to common environmental artifacts. Finally, the statistical tracking framework (JSD/KS) allows for earlier detection of growth compared to simple thresholding, potentially reducing the time-to-result for AST.
+
+Future work will focus on expanding the dataset to include more bacterial strains and antibiotic types, as well as optimizing the predictive model for early failure detection in diagnostic tests.
+
+\section{Conclusion}
+We have developed an AI-assisted colorimetric analysis pipeline for MIC determination. By leveraging modern computer vision techniques such as SAM and statistical distribution analysis, we achieved reliable quantification of bacterial growth in a cost-effective smartphone-based setup. This work paves the way for accessible, rapid antibiotic susceptibility testing in diverse clinical settings.
+
+\end{document}
