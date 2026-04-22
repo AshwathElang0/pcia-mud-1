@@ -106,8 +106,8 @@ control_df.to_csv(os.path.join(RESULTS_DIR, 'control_samples_data.csv'), index=F
 plt.figure(figsize=(10, 6))
 row0 = control_df[control_df['Row'] == 0]
 row1 = control_df[control_df['Row'] == 1]
-plt.scatter(row0['Time'], row0['A_star_median'], color='blue', s=40, alpha=0.44, label='Row 0')
-plt.scatter(row1['Time'], row1['A_star_median'], color='pink', s=40, alpha=0.44, label='Row 1')
+plt.scatter(row0['Time'], row0['A_star_median'], color='blue', s=40, alpha=0.44, label='No bact (ref)')
+plt.scatter(row1['Time'], row1['A_star_median'], color='pink', s=40, alpha=0.44, label='Bact')
 plt.xlabel('Timesteps (min)')
 plt.ylabel('Median a*')
 plt.title('Per-sample Median a* by Timestep')

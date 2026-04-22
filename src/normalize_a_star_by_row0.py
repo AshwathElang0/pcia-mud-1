@@ -71,7 +71,7 @@ plt.scatter(
     color="blue",
     s=40,
     alpha=0.8,
-    label="Row 0 (normalized)",
+    label="No bact (normalized)",
 )
 plt.scatter(
     row1_norm["Time"],
@@ -79,7 +79,7 @@ plt.scatter(
     color="pink",
     s=40,
     alpha=0.8,
-    label="Row 1 (normalized with row-0 stats)",
+    label='Bact (normalized with "No bact" stats)',
 )
 plt.xlabel("Timesteps (min)")
 plt.ylabel("Normalized median a*")
