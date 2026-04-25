@@ -1,0 +1,46 @@
+
+
+\begin{table*}
+\begin{center}
+\begin{small}
+\renewcommand{\arraystretch}{1.1}
+\renewcommand{\tabcolsep}{9pt}
+
+\caption{Average $R^2$, $r_x$, and $NDTW$ between the original and reconstructed ECG leads/signals for all patients in PTBDB and INCARTDB: column `Pers.' refers to the personalized LSTM-UNet model \cite{lstm-unet}, and `Gen.' to the generalized LSTM-UNet model.}
+
+\begin{tabular}{|c|cc|cc|cc|cc|cc|cc|}
+\hline
+\cline{2-13}
+& \multicolumn{6}{c|}{PTBDB}
+& \multicolumn{6}{c|}{INCARTDB} \\
+
+% \hline
+\cline{2-13}
+& \multicolumn{2}{c|}{$R^2$}
+& \multicolumn{2}{c|}{$r_x$} & \multicolumn{2}{c|}{$NDTW$} & \multicolumn{2}{c|}{$R^2$}
+& \multicolumn{2}{c|}{$r_x$} & \multicolumn{2}{c|}{$NDTW$}\\
+
+\cline{2-13}
+Lead & Pers. & Gen. & Pers. & Gen. & Pers. & Gen.& Pers. & Gen. & Pers. & Gen. & Pers. & Gen. \\
+\hline
+III  & 93.07 & 73.65 &  96.77 & 87.45 & 0.0107 & 0.0178 & 96.48 & 76.62 & 98.25  & 88.46 & 0.0065 & 0.0140\\
+aVR  & 92.20 & 92.17 &  97.70 & 96.95 & 0.0058 & 0.0085 & 97.60 & 90.11 & 98.80  & 94.94 & 0.0052 & 0.0110\\
+aVL & 95.65 & 83.34 & 97.92  & 90.84 & 0.0088 & 0.0160 & 93.91 & 65.89 & 96.98  & 80.72 & 0.0077 & 0.0142\\
+aVF & 96.45 & 89.67 &  98.31 &95.42  & 0.0070 & 0.0098 & 98.27 & 85.24 & 99.17  & 93.05 & 0.0049 & 0.0110\\
+V1 & 95.63  & 81.85 &  97.85 &92.44  & 0.0098 & 0.0173 & 94.92  & 73.16 & 97.46 & 88.78 & 0.0063 & 0.0171\\
+V3 & 96.78  & 73.86 &  98.45 &92.05  & 0.0073 & 0.0141 &  94.30 & 67.76 & 97.18 & 79.02 & 0.0092 & 0.0193\\
+V4 & 93.32  & 65.72 &  96.91 &79.28 & 0.0099 & 0.0215 & 93.85  & 60.49 & 96.97 & 68.64 & 0.0101 & 0.0210\\
+V5 & 92.73 & 67.62 & 96.61 &  73.56 & 0.0080 & 0.0173 & 92.88  & 75.10 & 96.41  & 79.48 & 0.0083 & 0.0162 \\
+V6 & 93.34  & 68.07 &  96.86 & 83.22  & 0.0083 & 0.0166 & 93.61  & 72.41 & 96.81 & 78.73 & 0.0087 & 0.0161\\
+%\rule{0pt}{15pt}
+\hline
+Avg & 94.91 & 77.33 & 97.48 & 87.91 & 0.0084 & 0.0154 & 93.91 & 74.08 & 96.97 & 83.53 & 0.0074 & 0.0155 \\
+
+
+\hline
+\end{tabular}
+\label{ptbdb_incart_pg}
+\end{small}
+
+\end{center}
+\end{table*}

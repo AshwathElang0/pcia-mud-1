@@ -1,0 +1,42 @@
+
+
+
+
+\begin{table}
+\begin{center}
+\begin{small}
+\renewcommand{\arraystretch}{1.1}
+\renewcommand{\tabcolsep}{6pt}
+
+\caption{Average $R^2$, $r_x$, and $NDTW$ between the original and reconstructed ECG leads/signals for all patients in PTBDB: column `Pers.' refers to the personalized LSTM-UNet model \cite{lstm-unet}, and `Gen.' to the generalized LSTM-UNet model.}
+
+\begin{tabular}{|c|cc|cc|cc|}
+\hline
+\cline{2-7}
+& \multicolumn{2}{c|}{$R^2$}
+& \multicolumn{2}{c|}{$r_x$} & \multicolumn{2}{c|}{$NDTW$} 
+\\
+\cline{2-7}
+Lead & Pers. & Gen. & Pers. & Gen. & Pers. & Gen. \\
+\hline
+III  & 93.07 & 73.65 &  96.77 & 87.45 & 0.0107 & 0.0178\\
+aVR  & 92.20 & 92.17 &  97.70 & 96.95 & 0.0058 & 0.0085\\
+aVL & 95.65 & 83.34 & 97.92  & 90.84 & 0.0088 & 0.0160 \\
+aVF & 96.45 & 89.67 &  98.31 &95.42  & 0.0070 & 0.0098 \\
+V1 & 95.63  & 81.85 &  97.85 &92.44  & 0.0098 & 0.0173 \\
+V3 & 96.78  & 73.86 &  98.45 &92.05  & 0.0073 & 0.0141 \\
+V4 & 93.32  & 65.72 &  96.91 &79.28 & 0.0099 & 0.0215 \\
+V5 & 92.73 & 67.62 & 96.61 &  73.56 & 0.0080 & 0.0173 \\
+V6 & 93.34  & 68.07 &  96.86 & 83.22  & 0.0083 & 0.0166 \\
+%\rule{0pt}{15pt}
+\hline
+Avg & 94.91 & 77.33 & 97.48 & 87.91 & 0.0084 & 0.0154 \\
+
+
+\hline
+\end{tabular}
+\label{incart_results}
+\end{small}
+
+\end{center}
+\end{table}

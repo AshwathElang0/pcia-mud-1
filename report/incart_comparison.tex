@@ -1,0 +1,40 @@
+
+
+\begin{table}
+\begin{center}
+\begin{small}
+\renewcommand{\arraystretch}{1.1}
+\renewcommand{\tabcolsep}{6pt}
+
+\caption{Average $R^2$, $r_x$, and $NDTW$ between the original and reconstructed ECG leads/signals for all patients in INCARTDB: column `Pers.' refers to the personalized LSTM-UNet model \cite{lstm-unet}, and `Gen.' to the generalized LSTM-UNet model.}
+
+\begin{tabular}{|c|cc|cc|cc|}
+\hline
+\cline{2-7}
+& \multicolumn{2}{c|}{$R^2$}
+& \multicolumn{2}{c|}{$r_x$} & \multicolumn{2}{c|}{$NDTW$} 
+\\
+\cline{2-7}
+Lead & Pers. & Gen. & Pers. & Gen. & Pers. & Gen. \\
+\hline
+III  & 96.48 & 76.62 & 98.25  & 88.46 & 0.0065 & 0.014\\
+aVR  & 97.60 & 90.11 & 98.80  & 94.94 & 0.0052 & 0.011\\
+aVL & 93.91 & 65.89 & 96.98  & 80.72 & 0.0077 & 0.014 \\
+aVF & 98.27 & 85.24 & 99.17  & 93.05 & 0.0049 & 0.011 \\
+V1 & 94.92  & 73.16 & 97.46 & 88.78 & 0.0063 & 0.017\\
+V3 &  94.30 & 67.76 & 97.18 & 79.02 & 0.0092 & 0.019 \\
+V4 & 93.85  & 60.49 & 96.97 & 68.64 & 0.0101 & 0.021\\
+V5 & 92.88  & 75.10 & 96.41  & 79.48 & 0.0083 & 0.016 \\
+V6 & 93.61  & 72.41 & 96.81 & 78.73 & 0.0087 & 0.016 \\
+%\rule{0pt}{15pt}
+\hline
+Avg & 93.91 & 74.08 & 96.97 & 83.53 & 0.0074 & 0.015 \\
+
+
+\hline
+\end{tabular}
+\label{incart_results}
+\end{small}
+
+\end{center}
+\end{table}

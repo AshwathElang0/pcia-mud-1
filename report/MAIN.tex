@@ -1,0 +1,261 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+
+% rahul packages
+\usepackage{subcaption}
+\usepackage{url}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{AI-based 3-Lead to 12-Lead ECG Reconstruction: Towards Smartphone-based Public Healthcare
+% \thanks{Identify applicable funding agency here. If none, delete this.}
+}
+
+% \author{\IEEEauthorblockN{1\textsuperscript{st} Aditya Mallick}
+% \IEEEauthorblockA{\textit{Dept. of Electrical Engineering} \\
+% \textit{IIT Madras}\\
+% Madras, India \\
+% ee21b005@smail.iitm.ac.in}
+% \and
+% \IEEEauthorblockN{2\textsuperscript{nd} Rahul LR}
+% \IEEEauthorblockA{\textit{Dept. of Electrical Engineering} \\
+% \textit{IIT Hyderabad}\\
+% Hyderabad, India \\
+% ee18resch01004@iith.ac.in}
+% \and
+% \IEEEauthorblockN{3\textsuperscript{nd} Albert Shaiju}
+% \IEEEauthorblockA{\textit{Dept. of Electrical Engineering} \\
+% \textit{NIT Calicut}\\
+% Calicut, India \\
+% albertshaju100@gmail.com}
+% \and
+% \IEEEauthorblockN{4\textsuperscript{nd} Rahuldeb Sarkar}
+% \IEEEauthorblockA{\textit{Dept. of Respiratory Medicine and Critical Care} \\
+% \textit{Medway NHS Foundation Trust}\\
+% London, UK \\
+% rahuldeb.sarkar1@nhs.net}
+% \and
+% \IEEEauthorblockN{Soumya Jana}
+% \IEEEauthorblockA{\textit{Dept. of Electrical Engineering} \\
+% \textit{IIT Hyderabad}\\
+% Hyderabad, India \\
+% jana@ee.iith.ac.in}
+% }
+
+\author{
+  A. Mallick\thanks{\textsuperscript{1}Indian Institute of Technology Madras, Tamil Nadu, India.}\textsuperscript{1},
+  Rahul L.R.\thanks{\textsuperscript{2}Indian Institute of Technology Hyderabad, Telangana, India.}\textsuperscript{2},
+  A. Shaiju\thanks{\textsuperscript{3}National Institute of Technology Calicut, Kerala, India.}\textsuperscript{3},
+  S.D. Neelapala\textsuperscript{2},
+  L. Giri\textsuperscript{2}
+  R. Sarkar\thanks{\textsuperscript{4}Medway NHS Foundation Trust, London, UK.}\textsuperscript{4},
+  S. Jana\textsuperscript{2}
+}
+
+\maketitle
+
+\begin{abstract}
+
+Clinicians generally diagnose cardiovascular diseases (CVDs) using standard 12-Lead electrocardiogram (ECG). However, for smartphone-based public healthcare systems, a reduced 3-lead system may be preferred because of (i) increased portability, and (ii) reduced requirement for power, storage and bandwidth. Subsequently, clinicians require accurate 3-lead to 12-Lead ECG reconstruction, which has so far been studied only in the personalized setting. When each device is dedicated to one individual, artificial intelligence (AI) methods such as temporal long short-term memory (LSTM) and a further improved spatio-temporal LSTM-UNet combine have proven effective. In contrast, in the current smartphone-based public health setting where a common device is shared by many, developing an AI lead-reconstruction model that caters to the extensive ECG signal variability in the general population appears a far greater challenge. In this direction, we take a first step, and observe that the performance improvement achieved by a generative model, specifically, 1D Pix2Pix GAN (generative adversarial network), over LSTM-UNet is encouraging.
+ 
+\end{abstract}
+
+\begin{IEEEkeywords}
+Mobile healthcare, ECG lead Reconstruction, AI, LSTM, UNet, GAN.
+\end{IEEEkeywords}
+
+\input{general_monitoring}
+
+% \input{LSTMandUNetandGAN}
+\input{Threemodels}
+
+\section{Introduction}
+
+The electrocardiogram (ECG) remains a cornerstone of diagnosis and management of cardiovascular diseases (CVDs), and hence that of public healthcare services in view of high prevalence of CVDs. While most clinicians are trained to diagnose based on the standard 12-Lead ECG system \cite{12lead}, such a bulky system may not be ideal for mobile health services. Instead, a reduced 3-lead system (Figure \ref{general_monitoring}(a)) is preferred because of (i) increased portability, and (ii) reduced requirement for power, storage and communication bandwidth \cite{R3lead}. See Figure \ref{general_monitoring}(b) for a block schematic of a mobile public health system envisaged to collect 3-lead ECG data from remote members of the public, communicate those to medical data centers, and serve the same data in the desired 12-lead format to the clinician when a cause for medical concern (alert) arises. Of course, the 3-lead to 12-lead ECG reconstruction should be sufficiently accurate for the envisaged system to be reliable. 
+Unfortunately, the existing lead-reconstruction literature rarely mentions the aforesaid public setting, while reporting extensively on algorithms in a personalized setting, where a user possesses a personal device for exclusive use and the embedded algorithms are trained on past personal data with the goal of dealing with future personal data. Examples utilize model-based as well as machine learning methods \cite{dower,affine,amit,lstm,lstm-unet}. In contrast, the present public setting would require training based on data from a suitably representative subset of patients, and testing on data from unseen ones. As the ECG signal variability in the general population is expected to be considerably higher compared to that in individual subjects, learning a model to capture the former poses a significantly greater challenge.
+In response, we take the first step by evaluating in the public setting the performance of algorithms considered the state of the art in the personalized setting, understand the performance gap and explore a possible path towards narrowing the gap and hence towards a satisfactory mobile public health system. In the personalized setting, spatial methods based on linear transforms have been suggested \cite{amit}, and tested on two publicly available 12-lead ECG databases, namely, PhysioNet’s Physikalisch-Technische Bundesanstalt (PTB) database and St. Petersburg Institute of Cardiological Technics (INCART)  arrhythmia  database \cite{physionet}. AI-algorithms exploiting temporal aspects, such as Long Short-Term Memory (LSTM), have since been found superior \cite{lstm}. A recent spatio-temporal method suitably combining LSTM and UNet has achieved further improvement \cite{lstm-unet}. 
+In this paper, we consider a public setting, where against the performances of the aforesaid LSTM and LSTM-UNet algorithms, a more powerful AI tool based on Generative Adversarial Network (GAN) is evaluated for the ECG reconstruction task. Here we report the results on a larger and more comprehensive PTBXL database \cite{physionet}. However, as records (about 5s) in PTBXL database are too short for training personalize algorithms precluding personalized analysis, comparison with the later is presented for PTB database (with 30s records) along with suitable disease subgroup analysis.
+
+
+%Additionally, we intend to compare these results with those obtained in personalized settings to identify any performance gaps. Moreover, we are particularly interested in understanding the performance of these models within various disease subgroups, to assess their robustness and efficacy across different clinical scenarios.
+
+
+
+% Those models were then tested on the PTB and PTBXL databases. The performance improvement obtained by using GANs over other methods in the public setting is very encouraging, only slightly falling behind the advantage of personalized setting. However, the performance for a few leads remains somewhat far from being clinically satisfactory. This paper concludes with explorations into approaches that have the potential to achieve satisfactory performance.
+  
+
+
+% This includes the Chapman University, Shaoxing People’s Hospital (Chapman-Shaoxing) and Ningbo First Hospital (Ningbo) database, China Physiological Signal Challenge in 2018 (CPSC 2018) database, St Petersburg INCART 12-lead Arrhythmia database and the Georgia database. 
+
+
+
+
+% The absolute performance in the public setting is becoming clinically satisfactory, although the reconstruction accuracy in certain leads needs to be improved. The present paper concludes with explorations into AI tools which will potentially achieve even better performance.  
+
+%setting is inherently constrained when compared to personalized settings. Hence, the model has to maximize its adaptability across diverse demographics and heart conditions. Furthermore, the accurate reconstruction of intricate ECG morphology, encompassing both spatial and temporal dynamics, continues to pose a significant engineering challenge. This paper expands upon a previous work [???], where the authors highlighted the LSTM-UNet model efficacy in capturing intricate spatio-temporal characteristics of ECG signals, albeit in a personalized setting. Building on this, we reconfigured and extended these models to adapt to a general setting suitable for mobile health services. Of course, this transition necessitates careful fine-tuning of these models for the wide range of heart conditions and demographic diversity encountered in a general setting.
+
+
+% While doctors are extensively trained in diagnosing using the S12 ECG system, there has been a growing interest in the use of Reduced Lead (RL) ECG systems due to their simplicity and ease of use \cite{Rlead}. However, the RL systems poses challenges in capturing the complete electrical activity of the heart, potentially leading to diagnostic limitations. On the other hand, the S12 system has its own drawbacks. Its bulkiness and complexity make it less suitable for personalized settings, where ease of use and portability are critical. Moreover, in telemedicine applications, the S12 system may require substantial storage and bandwidth, posing challenges for remote health monitoring. To address these, various methods for reconstructing S12 from RL systems have been proposed. In general, Lead I, II, and V2, collectively known as the Reduced 3-Lead (R3L) system are commonly selected as source leads due to their ability to provide satisfactory 3D representation of different regions of the heart and have demonstrated diagnostic value in many cardiac conditions \cite{R3lead}. However, the majority of existing lead reconstruction approaches have predominantly focused on patient-specific or personalized settings [???]. While these methods have shown promise, they come with certain limitations. One key challenge is their reliance on substantial amounts of patient-specific data for training, resulting in time-consuming and resource-intensive processes. Moreover, the handling of sensitive medical information in personalized models can raise privacy concerns. These limitations motivated us for the development of a more generalized and efficient ECG reconstruction model. This paper expands upon our previous work [???], which concentrated on developing a model for lead reconstruction in personalized settings. In the current version, we have designed the lead reconstruction algorithm to be applicable to a broader population.
+
+% In this paper, we envisage a cardiac monitoring system, as depicted in Figure \ref{general_monitoring}. In scenarios like remote areas with limited resources, the proposed algorithm allows for facilitating timely diagnosis and medical decisions while minimizing bandwidth requirements. At hospital, the reconstructed 12-Lead ECG aids in efficient cardiac anomaly detection and the activation of alarms when necessary. Clinicians can then make informed decisions based on reconstructed 12-Lead ECG. However, developing such a generalized model comes with significant challenges. First and foremost, the availability of 12-Lead annotated large datasets encompassing a wide variety of heart conditions is crucial. Fortunately, resources like Physionet [???] have addressed this challenge to a certain extent. Second, each cardiac arrhythmia exhibits diverse and complex morphologies, requiring the model to accurately reconstruct these spatial variations. Third, heart electrical signals change over time, making it crucial to capture these temporal patterns for precise reconstruction. Devising effective algorithms that can accurately model and predict these spatio-temporal changes in ECG remains an ongoing engineering challenge.  
+
+% Against this backdrop, we note studies highlighting the remarkable capabilities of the UNet architecture in effectively capturing spatial features through its multiscale operations \cite{unet}. Similarly, LSTM networks have proven successful in capturing temporal dependencies in various tasks \cite{lstm}. Motivated by these findings, we propose a novel approach that combines the strengths of both architectures, creating a LSTM-UNet model. By integrating spatio-temporal features, our model enables accurate and efficient ECG reconstruction. When evaluated on publicly available datasets, our proposed algorithm demonstrates good performance, showcasing its potential to advanced ECG reconstruction for improved clinical outcomes.
+
+\input{flowchart}
+ 
+\section{Material and methods}
+
+Referring to Figure \ref{general_monitoring}(a), the specific task involves reconstructing nine uncircled leads, namely, III, aVR, aVL, aVF, V1, V3, V4, V5, and V6 based on the three circled leads I, II, and V2.
+
+\subsection{Databases and data preparation}
+
+As alluded, ECG lead reconstruction in the public setting requires models to be trained on a large dataset with a wide variety of cardiac representations. Accordingly, we made use of a training set that includes Shaoxing People’s Hospital’s patients arrhythmia database (SPHADB), database from China Physiological Signal Challenge in 2018 (CPSC) and GEORGIA and INCART databases \cite{physionet}. The developed models were tested and compared on the PTBXL database against LSTM and LSTM-UNet performances in public setting. 
+Further, the public setting performance was compared against that in the personalized setting on the PTB databases along with subgroup analysis. Subgroups include records from healthy controls (HC) and five diseased categories, namely, bundle branch block (BB), hypertrophy, cardiomyopathy and heart failure (HY), myocardial infarction (MI), valvular myocarditis and miscellaneous (VA), and those without diagnostic data (ND). Note that PTB records had been sampled at 1000 Hz, while records from the other databases at 500 Hz; hence, the former were resampled to 500 Hz for the sake of uniformity. In addition, all records were baseline corrected and normalized to the range [-1,1] before analysis \cite{sandeep}.
+
+
+ 
+
+%As PTB records records had been sampled at 1000 Hz, and records from the other databases at 500 Hz, the former were resampled to 500 Hz for uniformity. Further, all records were baseline corrected and normalized to the range [-1,1] before analysis \cite{sandeep}. In contrast to the personalized setting, where the lead-reconstruction algorithm was trained using a portion of each record and tested on the remainder, in the public setting, the algorithm was trained on a separate set of databases and tested on PTB and PTBXL databases (Figure \ref{flowchart}).
+
+\subsection{Long short-term memory (LSTM)}
+
+Traditional neural networks could be inadequate in processing temporal data because those are primarily designed for feedforward tasks, where the input/output usually does not have a sequential sense. In contrast, the current data point is influenced by previous data points in ECG time series data. In this context, the Recurrent Neural Network (RNN), proposed to capture temporal dependencies, is known to suffer from the vanishing/exploding gradient issue, hindering the capability to retain and propagate long-term dependencies. As a remedy, LSTM (Figure \ref{Threemodels}(a)) were introduced. The inherent memory cells and gating mechanisms allow LSTM models to learn and preserve relevant information, enabling them to effectively capture temporal patterns and intricate relationships between consecutive ECG samples. This ability is essential in reconstructing missing ECG leads, thus producing accurate representations of the underlying cardiac activity. 
+
+\input{HC_UH}
+\input{ptbxl_ptbdb_fulldata}
+\input{ptbdb_grouped}
+
+\subsection{U-shaped Network (UNet)}
+
+U-shaped Network (UNet) represents a deep learning model,
+finding extensive use in medical image analysis, which allows information fusion at different resolutions/scales (Figure \ref{Threemodels}(b)). It consists of contracting (encoder) and expanding (decoder) paths with skip connections at various levels/scales. The encoder captures the context, extracts features from the input data, and gradually reduces the spatial resolution while increasing the number of feature channels. The decoder, in contrast, fuses information inherited from the encoder with that available via skipped connections at each scale to reconstruct an output at a higher resolution. This multiscale operation allows of UNet to consider both local and global contexts within the ECG signal, and enhances its ability to accurately reconstruct missing leads.  
+
+\subsection{Generative Adversarial Network (GAN)}
+
+Generative Adversarial Networks (GANs) are designed to produce new statistically-indistinguishable samples from a given collection of data by training two neural networks, a generator and a discriminator, in an adversarial process (see Figure \ref{Threemodels}(c)). Taking random noise input, the generator proposes a candidate sample, while the discriminator evaluates whether that is authentic (i.e., statistically similar to the given collection). The process of training involves the generator attempting to produce increasingly realistic samples, which the discriminator attempts to detect as artificial with increasing sophistication. This adversarial process continues till the generator produces artificial data that are not reliably distinguishable by the discriminator from real ones. A related class of problems exist, where each data point consists of multiple attributes, of which a few are given and the rest needs to be recovered based on the conditional distribution of the missing ones given the available ones. Such problems are solved using a variant, conditional GAN (CGAN), where, referring to Figure \ref{Threemodels}(c), the input now consists of the given attributes along with random noise, and the real example is replaced by the available values of the missing attributes during the training phase.  
+
+Now consider the seemingly unrelated problem of translating a black-and-white picture to a colored one. This and similar image translation problems, where one seeks missing image attributes (such as color) of each pixel from the given ones (grey scale intensity), may be posed as below: Draw samples from the conditional distribution of the desired attributes given the known ones. 
+A variant of CGAN, called Pix2Pix GAN, has proven useful in solving image translation problems \cite{ganconditional}. Returning to the task of 3-lead to 12-lead ECG reconstruction, it poses the analogous problem of inferring 9 missing leads/attributes given the 3 given ones at every point of the one-dimensional (1D) time sequence (analogous to 2D pixel) \cite{gantimeseries}. For the current problem, noting the above analogy with image translation problems, we therefore make use of a 1D version of the 2D Pix2Pix\footnote{Although pixel stands for a 2D picture element, we shall retain this nomenclature even in 1D for the sake of notional continuity and comprehensibility.} GAN.  
+
+Specifically, we make use of a UNet-based generator and a Markovian patch/interval-based discriminator that classifies small overlapping 1D intervals (analogous to 2D patches) one at a time instead of the whole time series. Overall decision is taken via a majority principle. This approach allows the discriminator to focus on local structures rather than global features. The present
+discriminator is based on a convolutional neural network (CNN) architecture designed to include high-frequency details. This approach assumes that details between intervals are independent (realistic for distant intervals). 
+
+
+%During training, the generator tries to generate images that look like the target images given the input images, while the discriminator tries to distinguish between the real target images and the generator’s output. By using the Pix2Pix GAN, the model can capture the complex relationships between the 3-lead and 9-lead ECGs, producing high-quality reconstructions that are useful for clinical diagnosis. The use of PatchGAN discriminator helps ensure that the generated ECGs have realistic local structures.
+
+%Instead of classifying the entire image as real or artificial, it classifies patches of the image, which helps the model to focus on local structures and textures. During training, the generator tries to generate images that look like the target images given the input images, while the discriminator tries to distinguish between the real target images and the generator’s output.
+
+
+% Our task of 3-lead to 12-lead ECG reconstruction can be boiled down to an image-to-image translation problem. In the context of ECG lead reconstruction, we can treat the available three leads as the input image and the nine unavailable leads as the output image. Unlike the traditional GAN, which generates data from random noise, here the GAN has to generate output based on some input condition. 
+
+
+
+% The Pix2Pix GAN is well-suited for 3-lead to 12-lead ECG reconstruction in a public setting due to its ability to learn a mapping from input to output images, conditioned on the input image. The input to the generator is the 3-lead ECG data, and the output is the corresponding missing 9-lead ECG data. The model is trained on a dataset of paired 3-lead and 9-lead ECG recordings. The generator learns to produce 9-lead ECGs from 3-lead inputs that are realistic and closely match the real 9-lead recordings. 
+
+
+\subsection{Proposed workflow and performance measures} 
+
+
+% While traditional neural networks struggle to process time series data like ECG due to their feedforward design, LSTM with its feedback configuration captures crucial temporal patterns and lead relationships. The UNet architecture (particularly successful in medical image analysis) incorporates spatial context through an encoder-decoder architecture with skip connections, enhancing lead reconstruction accuracy by capturing multiscale information. The LSTM-UNet combination effectively integrates these spatio-temporal strengths in the context of ECG lead reconstruction. However the LSTM-UNet model can struggle when it comes to data generation tasks, suffering from poor generalisation ability. To overcome this, we pose our problem as an image translation task from 3 lead input to 9 lead output and use a generative adversarial network based on the Pix2Pix architecture for the same. 
+
+% The present implementation employed Keras and TensorFlow, and featured five LSTM layers (512, 256, 128, 64, 32 units) with ReLU activation and dropout. The UNet comprised four convolution blocks (64, 128, 256, 512) with leaky ReLU activation, max pooling, and dropout. Decoder mirrored encoder with upsampling. The model was trained for 400 epochs, stopping early in case of no performance improvement.
+% The discriminator uses the Binary Cross Entropy (BCE) loss function to classify images, whereas the generator uses a combination of BCE loss and mean absolute error (MAE) or $L_1$ loss. 
+
+The Pix2Pix GAN model was implemented using the PyTorch library. The UNet generator consists of 7 downsampling and upsampling blocks which make up the encoder and decoder respectively. Each block consists of a 1D convolution/transpose convolution layer, a batch normalisation layer and an activation function. For downsampling, we use the Leaky Rectified Linear Unit (LeakyReLU) activation and for upsampling regular ReLU is used. For the last upsampling block, we use $\tanh$ activation to ensure the output lies in the range [-1,1]. The input to the model consists of 3 channels of 1D data of length $L$, i.e., a $3\times L$ matrix, which is reconstructed to form a $9\times L$ matrix, where $L$ is the length of the signal cropped to the nearest multiple of $128$. The output shares the same dimensions. During training, we used training samples of size $3 \times 4992$. In case of longer sequences, multiple training sequences were obtained via a sliding window technique. This ensured a fixed signal length for use with PyTorch tensors and dataloaders. For evaluation, we supplied the original length of the signal to the model without windowing. The model was trained for 14 epochs, with early stopping based on the highest $R^2$ score on the test dataset and a patience value of 3 epochs.
+
+%\subsection{Performance measures}
+
+As measures of ECG signal reconstruction performance/accuracy, we made use of coefficient of determination ($R^2$) and Pearson's correlation coefficient ($r_x$). Specifically, considering patient record $x_i$, $i=1,2,...,n$, reconstructed to $y_i$, the aforesaid performance indices are computed by $R^2 = 1-\frac{\Sigma_{i=1}^n {(x_i-\bar{y})}^2}{\Sigma_{i=1}^n {(y_i-\bar{y})}^2}$ and $r_x = \frac{\Sigma_{i=1}^n {(x_i-\bar{x})} {(y_i-\bar{y})}}{\sqrt{\Sigma_{i=1}^n {(x_i-\bar{x})}^2} \sqrt{\Sigma_{i=1}^n {(y_i-\bar{y})}^2}}$. A perfect reconstruction would achieve $R^2 = 1$ (within the range $[0,1]$) and $r_x = 1$ (within the range $[-1,1]$).
+
+
+%for strong positive correlation. Conversely, lower values of $R^2$ and $r_x$ indicate weaker reconstruction performance, suggesting the need for improvements in the ECG signal reconstruction methods.
+
+\section{Results}
+
+For visual appreciation of the reader, we begin by presenting in Figure \ref{HC_UH} the waveforms of the nine reconstructed leads (namely, III, aVR, aVL, aVF, V1, V3, V4, V5, and V6) obtained using the 1D Pix2Pix GAN model in the public setting (in red, whereas the original is in blue) based on three given leads (I, II and V2) as input for two representative records (Record No: patient195/s0337 in left panel, Record No: patient280/s0535 in right panel, MI sub-group patients from PTB). As a state-of-the-art reference, the same reconstructions performed by LSTM-UNet in the personalized setting were depicted in green. Except for leads V4, V5 and V6, the public setting reconstructions appear reasonably close to reference personalized ones.  
+
+
+%While the reconstruction appeared more faithful in the personalized setting, that even in the public setting seem reasonably accurate in certain leads including aVR. 
+
+Next, we statistically analyzed the test performance of the proposed method, and furnished in Table \ref{ptbxl_ptbdb_fulldata}. On the PTBXL database, in the public setting, the proposed GAN model achieves an overall $R^2$ (resp. $r_x$) measure of 84.84\% (resp. 93.16\%), which improves upon existing LSTM and LSTM-UNet performances of 69.34\% (resp. 82.27\%) and 74.59\% (resp. 85.97\%), respectively. Inspecting lead-wise statistics closely, leads such as avR ($R^2=$97.58\%, $r_x=$99.17\%) appeared to account for fairly accurate reconstruction, whereas leads such as V4 ($R^2=$78.08\%, $r_x=$89.13\%) appeared less satisfactory. 
+%The overall absolute performance of developed models on the PTBXL is presented in Table \ref{ptbxl_ptbdb_fulldata}. In the public setting, the GAN achieved a mean $R^2$ of 84.84\%, significantly outperforming the LSTM-UNet, which achieved 74.59\%. Analogous trend was observed in PTB as well, where, the GAN achieved a mean $R^2$ of 84.43\% vis-\`{a}-vis 75.05\%. 
+On the PTB database, again in the public setting, the aforementioned algorithms exhibited performances that were broadly similar, numerically. However, we now had an additional reference of personalized performance available from another source \cite{lstm-unet}. The $R^2$ (resp. $r_x$) measure of 84.43\% (resp. 92.73\%) in the public setting compares with 95.01\% (resp. 97.71\%) in the personalized case, indicating a still significant gap. However, for certain leads such as avR, the said gap is less significant (97.29\% versus 98.20\% in terms of $R^2$, and 99.12\% versus 99.77\% in terms of $r_x$), whereas for certain other leads, such as V4, such gap is more prominent (68.96\% versus 93.32\% in terms of $R^2$, and 84.84\% versus 96.91\% in terms of $r_x$).
+
+
+%Similar modest gains were noted in correlation coefficient $r_x$ for both databases. However, comparing the the overall absolute performance of LSTM-UNet and GAN in the public setting with that in the personalized setting (refer to PTB results in Table \ref{ptbxl_ptbdb_fulldata}), the mean performance gap was significantly smaller for the GAN ($R^2$ gap: 19.96\% vs 10.58\% and $r_x$ gap: 10.12\% vs 4.98\%). Interestingly, that gap was less significant for certain leads, such as aVR. 
+
+
+Continuing with the PTB database, we next performed similar statistical analysis within patient subgroups, namely, healthy HC, and diseased BB, HY, MI, VA, and ND, and furnished in Table \ref{ptbdb_grouped}. In the public setting, the proposed GAN model consistently outperformed competing models in terms of both $R^2$ and $r_x$. Further, the performance gap between the public and the personalized settings appeared to be less in the healthy control (HC), bundle branch block (BB), and myocardial infarction (MI) subgroups, and somewhat more in hypertrophy, cardiomyopathy and heart failure (HY) and valvular myocarditis and miscellaneous (VA) subgroups. The gap was the most significant in the default subgroup ND (without diagnostic data), but as
+clinical significance cannot be assigned there, it was presently ignored. In most subgroups, a few leads, such as V4, V5 and V6, proved intransigent towards reconstruction in the public setting. The above identifies the contexts (i.e., in relation to specific subgroups and specific leads) where the current AI model needs significant improvement before becoming practically useful. 
+
+
+%Compared to the personalized settings, the GAN exhibited a significant performance gap in a few leads, specifically V4, V5 and V6, in all sub-groups, with the gap being larger in case of VA sub-group for lead V5 ($R^2$: 38.09\% in generalized and 97.04\% in personalized settings). 
+
+\section{Discussion}
+
+In this paper, we considered 3-lead to 12-lead ECG reconstruction in the public setting. There, a 1D Pix2Pix GAN model was found to provide performance improvement on multiple test datasets over LSTM and LSTM-UNet models that proved efficient in the personalized setting. While encouraging, the proposed model needed further improvement before practical deployment, as a significant gap remained between the algorithmic performances obtained in the public and personalized settings, especially in some of the chest leads V1--V6, which are crucial in the diagnosis of important cardiac conditions including myocardial infarction (MI). However, continued research in this direction to fill the aforesaid gaps should be useful because, if/when proven satisfactory, the GAN model under consideration will have practical relevance in smartphone applications due to its compact architecture (with only about 30 million parameters). The resulting setup, with real-time on-device processing and without needing external computational resources, could be attractive in the target remote healthcare scenarios.
+
+%Such a streamlined setup is particularly suitable for cardiac monitoring in public settings, as it enables real-time, on-device processing without relying on external computational resources.  
+
+A related problem of ECG signal synthesis arises from the growing need for statistically authentic synthetic data for testing medical devices and algorithms. Variations of GAN models, such as time-series GAN and LSTM-GAN \cite{gantimeseries, lstmgan}, have proven useful in handling the above  and other related problems. Whether such GAN variants are efficient for our lead reconstruction problem could be a worthwhile exploration as well. Also, the cost function can be made dependent on known lead information for better contextualization and potentially improved efficacy. Also, adding side information such as a (cheaply acquired) photoplethysmograph (PPG) channel alongside the 3-lead ECG potentially adds robustness. 
+
+Of course, a novel approach could also be to algorithmically generate health alerts based on three leads (refer to the dashed path in Figure \ref{general_monitoring}(b)), and perform lead reconstruction only upon alert, thus saving resources.
+
+
+%However, determining which chest lead to choose requires further clinicians' support and research. We also anticipate that a novel AI model can be trained to generate health alert using 3-lead ECG instead of the legacy 12-lead data. Referring to the dashed path in Figure \ref{general_monitoring}(b), this will save significant computation by needing to invoke the 3-lead to 12-lead ECG reconstruction algorithm only when an alert is generated.
+
+
+
+
+%Looking ahead, a more efficient (in terms of bandwidth as well as computation) mobile healthcare system could be achieved by incorporating a 3-lead anomaly detection mechanism to the envisaged framework (see Figure \ref{general_monitoring}(b)). Expanding the proposed algorithm to diverse physiological waveforms like EEG, holds promising potential for diverse medical applications.
+
+
+
+
+
+% Table \ref{ptbdb_incart_pgg} presents a performance comparison of LSTM-UNet in both personalized and public settings. Compared to personalized setting, performance of public setting is largely depressed, possibly due to the constraints in capturing the ECG data variability. This underscores the necessity for more advanced  models, including generative approaches like GANs, to address these limitations. Additionally, it is crucial to establish clinically acceptable thresholds for metrics such as $R^2$, $r_x$, and $NDTW$. Refer to Figure \ref{general_monitoring} for an overview of the envisioned future mobile healthcare system, which involves collecting 3-lead ECG data from the public, transmitting it to medical data centers, performing 3-lead-based anomaly detection, and subsequently presenting the data in 12-lead format to clinicians during medical alerts. This proposed setup not only conserves bandwidth but also reduces computational demands. Furthermore, the developed generalized algorithm can be extended to other physiological waveforms, such as electroencephalogram (EEG), which exhibit multiple distinct waveforms. This expansion would greatly enrich the potential applications and impact of our research.
+
+
+\begin{thebibliography}{00}
+
+\bibitem{12lead} A.H. Ribeiro \textit{et al}., ``Automatic diagnosis of the 12-lead ECG using a deep neural network,'' \textit{Nat. Commun.}, vol. 11, no. 1, p. 1760, 2020.
+
+% \bibitem{Rlead} J. Francis, ``ECG monitoring leads and special leads,'' \textit{Indian Pacing Electrophysiol. J.}, vol. 16, no. 3, pp. 92-95, May 2016.
+
+\bibitem{R3lead} J.A. Scherer, J. M. Jenkins, and J. M. Nicklas, ``Synthesis of the 12-lead electrocardiogram from a 3-lead subset using patient-specific transformation vectors—An algorithmic approach to computerized signal synthesis,'' \textit{J. Electrocardiol.}, vol. 22, Suppl, pp. 128-128, 1989.
+
+\bibitem{dower} G.E. Dower., ``A lead synthesizer for the Frank system to simulate the standard 12-lead electrocardiogram.'' \textit{J. Electrocardiol.}, vol. 1, no. 1, pp. 101--116, 1968.
+
+\bibitem{affine} D. Dawson, H. Yang, M. Malshe, ST Bukkapatnam, B. Benjamin and R. Komanduri., ``Linear affine transformations between 3-lead (Frank XYZ leads) vectorcardiogram and 12-lead electrocardiogram signals,'' \textit{J. Electrocardiol.}, vol. 42, no. 6, pp. 622–630, 2009.
+
+
+\bibitem{amit} S. Maheshwari, A. Acharyya, P. Rajalakshmi, P.E. Puddu, M. Schiariti., ``Accurate and reliable 3-lead to 12-lead ECG reconstruction methodology for remote health monitoring applications,'' \textit{IRBM}, vol. 35, no. 6, pp. 341--350, 2014.
+
+\bibitem{physionet} G.B. Moody, R.G. Mark, and A.L. Goldberger, ``PhysioNet: a web-based resource for the study of physiologic signals,'' \textit{IEEE Eng. Med. Biol. Mag.}, vol. 20, no. 3, pp. 70--75, 2001.
+
+\bibitem{lstm} J. Sohn, S. Yang, J. Lee, Y. Ku, H.C. Kim., ``Reconstruction of 12-lead electrocardiogram from a three-lead patch-type device using a LSTM network,'' \textit{Sensors}, vol. 20, no. 11, pp. 3278, 2020.
+
+\bibitem{lstm-unet} L.R. Rahul, A. Shaiju and S. Jana., ``3-Lead to 12-Lead ECG Reconstruction: A Novel AI-based Spatio-Temporal Method,'' \textit{20th INDICON}, pp. 957--962, 2023.
+
+\bibitem{sandeep} B.S. Chandra, C.S. Sastry, S. Jana., ``Robust heartbeat detection from multimodal data via CNN-based generalizable information fusion,'' \textit{IEEE Trans. Biomed. Eng.}, vol. 66, no. 3, pp. 710--717, 2020.
+
+\bibitem{ganconditional} P. Isola, J.Y. Zhu, T. Zhou and A.A. Efros., ``Image-to-image translation with conditional adversarial networks,'' \textit{CVPR}, pp. 1125--1134, 2017. 
+
+% \bibitem{gan1to12} J Joo, G Joo, Y Kim, MN Jin, J Park and H Im., ``Twelve-Lead ECG Reconstruction from Single-Lead Signals Using Generative Adversarial Networks,'' \textit{MICCAI}, pp. 184--194, 2023.
+
+\bibitem{gantimeseries}  R. Banerjee,  O. Mazumder, A. Mukherjee,  S. Sinhahajari and A. Sinha., ``Reconstruction of Body Surface Potential From 12-Lead ECG: A Conditional GAN Based Approach,'' \textit{31st EUSIPCO}, pp. 1180-1184, 2023.
+
+\bibitem{lstmgan} Y.H. Zhang and S. Babaeizadeh., ``Synthesis of standard 12‑lead electrocardiograms using two-dimensional generative adversarial networks,'' \textit{J. Electrocardiol.}, vol. 69, pp. 6--14, 2021.
+
+\end{thebibliography}
+
+\end{document}

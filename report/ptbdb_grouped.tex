@@ -1,0 +1,337 @@
+
+
+\begin{table*}[t!]
+\begin{center}
+%\tiny
+\caption{Average $R^2$ and $r_x$ between each of the original and reconstructed ECG leads within different patient subgroups in PTB: (a) HC, (b) BB, (c) HY, (d) MI, (e) VA, and (f) ND. Column `a': LSTM model; Column `b': LSTM-UNet model and Column `c': Pix2Pix GAN model in the public setting; and Column `d': LSTM-UNet model in the personalized setting. 
+}
+\renewcommand{\arraystretch}{1.2}
+\renewcommand{\tabcolsep}{3pt}
+\begin{tabular}{cc}
+{
+\begin{footnotesize}
+\begin{tabular}{|c|cccc|cccc|}
+\hline
+% \cline{2-9}
+% & \multicolumn{8}{c|}{PTBDB} \\
+
+\cline{2-9}
+& \multicolumn{4}{c|}{$R^2$}
+& \multicolumn{4}{c|}{$r_x$} \\
+\cline{2-9}
+
+Lead & a & b & c & d & a & b & c & d \\
+\hline
+III &  0.6479 & 0.6992 & \textbf{0.8913} & 0.9622 & 0.8428 & 0.8459 & \textbf{0.9494} & 0.9817
+ \\
+
+avR & 0.9414 & 0.9698 & \textbf{0.9879} & 0.9925 & 0.9711 & 0.9868 & \textbf{0.9961} & 0.9963
+  \\
+
+avL & 0.713 & 0.7331 & \textbf{0.8673} & 0.9706 & 0.7441 & 0.8768 & \textbf{0.9447} & 0.9861
+  \\
+
+avF & 0.8315 & 0.9245 & \textbf{0.9634} & 0.9835 & 0.9088 & 0.9618 & \textbf{0.9877} & 0.992
+  \\
+
+V1 & 0.7021 & 0.7750 & \textbf{0.8545} & 0.9783 & 0.8735 & 0.8898 & \textbf{0.9415} & 0.9894
+  \\
+
+V3 & 0.7796 & 0.7969 & \textbf{0.8324} & 0.9764 & 0.9094 & 0.9162 & \textbf{0.9261} & 0.9887
+  \\
+
+V4 & 0.4724 & 0.5056 & \textbf{0.5836} & 0.9654 & 0.8099 & 0.8285 & \textbf{0.8601} & 0.9835
+  \\
+
+V5 & 0.7111 & 0.7935 & \textbf{0.8790} & 0.9563 & 0.9034 & 0.9101 & \textbf{0.9450} & 0.9796
+  \\
+
+V6 & 0.7499 & 0.8407 & \textbf{0.9185} & 0.9762 & 0.9236 & 0.9332 & \textbf{0.9633} & 0.9900
+  \\
+
+%\rule{0pt}{15pt}
+\hline
+
+Avg & 0.7276 & 0.7820 & \textbf{0.8642} & 0.9734 & 0.8762  & 0.9054 & \textbf{0.9460} & 0.9874 \\
+
+\hline
+\end{tabular}
+\end{footnotesize}
+}
+&
+{
+\begin{footnotesize}
+\begin{tabular}{|c|cccc|cccc|}
+\hline
+% \cline{2-9}
+% & \multicolumn{8}{c|}{PTBDB} \\
+
+% \hline
+\cline{2-9}
+& \multicolumn{4}{c|}{$R^2$}
+& \multicolumn{4}{c|}{$r_x$} \\
+\cline{2-9}
+
+Lead & a & b & c & d & a & b & c & d \\
+\hline
+III & 0.7029 & 0.7971 & \textbf{0.9002} & 0.9132 & 0.7984 & 0.8502 & \textbf{0.9518} & 0.9613
+  \\
+
+avR & 0.8447 & 0.9181 & \textbf{0.9603} & 0.9678 & 0.9207 & 0.9583 & \textbf{0.9832} & 0.9885
+  \\
+
+avL & 0.7408 & 0.8414 & \textbf{0.9370} & 0.9599 & 0.8872 & 0.9334 & \textbf{0.9731} & 0.9799
+  \\
+
+avF & 0.8328 & 0.9114 & \textbf{0.9684} & 0.9744 & 0.9158 & 0.9593 & \textbf{0.9885} & 0.9944
+  \\
+
+V1 & 0.7098 & 0.8060 & \textbf{0.8487} & 0.9533 & 0.8047 & 0.9012 & \textbf{0.9378} & 0.9767
+  \\
+
+V3 & 0.8376 & 0.8667 & \textbf{0.9031} & 0.9731 & 0.9330 & 0.9499 & \textbf{0.9617} & 0.9870
+  \\
+
+V4 & 0.5380 & 0.6342 & \textbf{0.7012} & 0.9380 & 0.7210 & 0.8058 & \textbf{0.8252} & 0.9700
+  \\
+
+V5 & 0.4809 & 0.6862 & \textbf{0.8131} & 0.8996 & 0.7723 & 0.8148 & \textbf{0.8985} & 0.9544
+  \\
+
+V6 & 0.5769 & 0.6099 & \textbf{0.7851} & 0.9019 & 0.7508 & 0.7566 & \textbf{0.8692} & 0.9594
+  \\
+
+%\rule{0pt}{15pt}
+\hline
+
+Avg & 0.6960 & 0.7856 & \textbf{0.8686} & 0.9423 & 0.8337 & 0.8810 & \textbf{0.9321} & 0.9746 \\
+
+\hline
+\end{tabular}
+\end{footnotesize}
+} \\
+(a) Healthy controls HC & (b) Bundle branch block BB\\
+{
+\begin{footnotesize}
+\begin{tabular}{|c|cccc|cccc|}
+\hline
+% \cline{2-9}
+% & \multicolumn{8}{c|}{PTBDB} \\
+
+% \hline
+\cline{2-9}
+& \multicolumn{4}{c|}{$R^2$}
+& \multicolumn{4}{c|}{$r_x$} \\
+\cline{2-9}
+
+Lead & a & b & c & d & a & b & c & d \\
+\hline
+III & 0.6051 & 0.7482 & \textbf{0.9153} & 0.9611 & 0.8399 & 0.8853 & \textbf{0.9656} & 0.981
+  \\
+
+avR & 0.8275 & 0.9346 & \textbf{0.9641} & 0.9801 & 0.9141 & 0.9669 & \textbf{0.9882} & 0.9898
+  \\
+
+avL & 0.7459 & 0.7739 & \textbf{0.8860} & 0.9658 & 0.8809 & 0.8984 & \textbf{0.9508} & 0.983
+  \\
+
+avF & 0.8028 & 0.9115 & \textbf{0.9132} & 0.9742 & 0.9021 & 0.9564 & \textbf{0.9683} & 0.9874
+  \\
+
+V1 & 0.6973 & 0.7157 & \textbf{0.7545} & 0.9712 & 0.8485 & 0.9059 & \textbf{0.9533} & 0.9859
+  \\
+
+V3 & 0.6969 & 0.7855 & \textbf{0.8480} & 0.9787 & 0.8240 & 0.9030 & \textbf{0.9344} & 0.9898
+  \\
+
+V4 & 0.2854 & 0.3693 & \textbf{0.4980} & 0.9407 & 0.5728 & 0.6339 & \textbf{0.7058} & 0.9711
+  \\
+
+V5 & 0.5918 & 0.6377 & \textbf{0.7281} & 0.9241 & 0.6380 & 0.7344 & \textbf{0.8224} & 0.9644
+  \\
+
+V6 & 0.4702 & 0.5364 & \textbf{0.7420} & 0.9454 & 0.7381 & 0.8134 & \textbf{0.8731} & 0.9747
+
+  \\
+
+%\rule{0pt}{15pt}
+\hline
+
+Avg & 0.6358 & 0.7125 & \textbf{0.8054} & 0.9601 & 0.7953 & 0.8552 & \textbf{0.9069} & 0.9807 \\
+
+\hline
+\end{tabular}
+\end{footnotesize}
+}
+&
+{
+\begin{footnotesize}
+\begin{tabular}{|c|cccc|cccc|}
+\hline
+% \cline{2-9}
+% & \multicolumn{8}{c|}{PTBDB} \\
+
+% \hline
+\cline{2-9}
+& \multicolumn{4}{c|}{$R^2$}
+& \multicolumn{4}{c|}{$r_x$} \\
+\cline{2-9}
+
+Lead & a & b & c & d & a & b & c & d \\
+\hline
+III & 0.6727 & 0.7354 & \textbf{0.8863} & 0.9161 & 0.8282 & 0.8776 & \textbf{0.9510} & 0.9606
+  \\
+
+avR & 0.7976 & 0.9445 & \textbf{0.9705} & 0.9746 & 0.8947 & 0.972 & \textbf{0.9907} & 0.9973
+  \\
+
+avL & 0.7517 & 0.8456 & \textbf{0.9324} & 0.9504 & 0.8825 & 0.9255 & \textbf{0.9727} & 0.9786
+  \\
+
+avF & 0.7487 & 0.8279 & \textbf{0.9287} & 0.9422 & 0.8769 & 0.9175 & \textbf{0.9754} & 0.9825
+  \\
+
+V1 & 0.7381 & 0.7597 & \textbf{0.8182} & 0.946 & 0.8701 & 0.8929 & \textbf{0.9206} & 0.9734
+  \\
+
+V3 & 0.7064 & 0.7129 & \textbf{0.8809} & 0.9587 & 0.8093 & 0.9015 & \textbf{0.9498} & 0.9800
+  \\
+
+V4 & 0.5300 & 0.6112 & \textbf{0.7241} & 0.9044 & 0.6578 & 0.727 & \textbf{0.8574} & 0.9557
+  \\
+
+V5 & 0.4042 & 0.4585 & \textbf{0.7027} & 0.9020 & 0.7606 & 0.7741 & \textbf{0.8427} & 0.9544
+  \\
+
+V6 & 0.6099 & 0.6279 & \textbf{0.7587} & 0.9297 & 0.8303 & 0.8340 & \textbf{0.8779} & 0.9583
+  \\
+
+%\rule{0pt}{15pt}
+\hline
+
+Avg & 0.6621 & 0.7248 & \textbf{0.8447} & 0.9360 & 0.8233  & 0.8691 & \textbf{0.9265} & 0.9712 \\
+
+\hline
+\end{tabular}
+\end{footnotesize}
+}
+\\
+(c) Hypertrophy, cardiomyopathy and heart failure HY & (d) Myocardial infarction MI \\
+{
+\begin{footnotesize}
+\begin{tabular}{|c|cccc|cccc|}
+\hline
+% \cline{2-9}
+% & \multicolumn{8}{c|}{PTBDB} \\
+
+% \hline
+\cline{2-9}
+& \multicolumn{4}{c|}{$R^2$}
+& \multicolumn{4}{c|}{$r_x$} \\
+\cline{2-9}
+
+Lead & a & b & c & d & a & b & c & d \\
+\hline
+III & 0.6218 & 0.7199 & \textbf{0.7589} & 0.9285 & 0.7824 & 0.863 & \textbf{0.8804} & 0.9655
+  \\
+
+avR & 0.9638 & 0.9776 & \textbf{0.9877} & 0.9901 & 0.9818 & 0.9896 & \textbf{0.9952} & 0.9958
+  \\
+
+avL & 0.677 & 0.7423 & \textbf{0.9262} & 0.9398 & 0.8491 & 0.8765 & \textbf{0.9690} & 0.9707
+  \\
+
+avF & 0.6808 & 0.9341 & \textbf{0.9457} & 0.9695 & 0.9136 & 0.9666 & \textbf{0.9771} & 0.9853
+  \\
+
+V1 & 0.8898 & 0.9288 & \textbf{0.9417} & 0.9587 & 0.9472 & 0.9656 & \textbf{0.9796} & 0.9797
+  \\
+
+V3 & 0.5801 & 0.6591 & \textbf{0.8292} & 0.9753 & 0.7304 & 0.9000 & \textbf{0.9377} & 0.9883
+  \\
+
+V4 & 0.5305 & 0.6260 & \textbf{0.7722} & 0.9546 & 0.7037 & 0.7831 & \textbf{0.8816} & 0.9836
+  \\
+
+V5 & 0.2726 & 0.3530 & \textbf{0.3809} & 0.9704 & 0.6111 & 0.7275 & \textbf{0.7928} & 0.986
+  \\
+
+V6 & 0.8170 & 0.8369 & \textbf{0.9052} & 0.9788 & 0.9089 & 0.9289 & \textbf{0.9586} & 0.9857
+  \\
+
+%\rule{0pt}{15pt}
+\hline
+
+Avg & 0.6703 & 0.7530 & \textbf{0.8275} & 0.9628 & 0.8253  & 0.8889 & \textbf{0.9302} & 0.9822 \\
+
+\hline
+\end{tabular}
+\label{incart_results}
+\end{footnotesize}
+}
+&
+{
+\begin{footnotesize}
+\begin{tabular}{|c|cccc|cccc|}
+\hline
+% \cline{2-9}
+% & \multicolumn{8}{c|}{PTBDB} \\
+
+% \hline
+\cline{2-9}
+& \multicolumn{4}{c|}{$R^2$}
+& \multicolumn{4}{c|}{$r_x$} \\
+\cline{2-9}
+
+Lead & a & b & c & d & a & b & c & d \\
+\hline
+III & 0.7167 & 0.8075 & \textbf{0.9019} & 0.9033 & 0.8616 & 0.9191 & \textbf{0.9584} & 0.9561
+  \\
+
+avR & 0.8330 & 0.9406 & \textbf{0.9745} & 0.9773 & 0.9134 & 0.9705 & \textbf{0.9907} & 0.9992
+  \\
+
+avL & 0.6709 & 0.8760 & \textbf{0.8810} & 0.9526 & 0.8348 & 0.9319 & \textbf{0.9391} & 0.9770
+  \\
+
+avF & 0.7871 & 0.9146 & \textbf{0.9482} & 0.9537 & 0.8960 & 0.9617 & \textbf{0.9846} & 0.9879
+  \\
+
+V1 & 0.6421 & 0.7574 & \textbf{0.7816} & 0.9306 & 0.8466 & 0.8902 & \textbf{0.8910} & 0.9660
+  \\
+
+V3 & 0.7117 & 0.8033 & \textbf{0.8588} & 0.9451 & 0.8857 & 0.9201 & \textbf{0.9281} & 0.9735
+  \\
+
+V4 & 0.4898 & 0.5988 & \textbf{0.6884} & 0.8962 & 0.6889 & 0.8050 & \textbf{0.8296} & 0.9510
+  \\
+
+V5 & 0.3794 & 0.4560 & \textbf{0.5409} & 0.9114 & 0.5579 & 0.6052 & \textbf{0.6865} & 0.9578
+  \\
+
+V6 & 0.3296 & 0.3956 & \textbf{0.4944} & 0.8785 & 0.7127 & 0.7335 & \textbf{0.7632} & 0.9435
+  \\
+
+%\rule{0pt}{15pt}
+\hline
+
+Avg & 0.6178 & 0.7277 & \textbf{0.7855} & 0.9276 & 0.7997  & 0.8596 & \textbf{0.8857} & 0.9680 \\
+
+\hline
+\end{tabular}
+\label{incart_results}
+\end{footnotesize}
+}
+\\
+(e) Valvular myocarditis and miscellaneous VA & (f) Without diagnostic data ND \\
+\end{tabular}
+\label{ptbdb_grouped}
+
+% \begin{footnotesize}
+% \multicolumn{10}{p{\textwidth}}{{In the table, `a' refers to the Linear Transformation (LT) method \cite{amit}, `b' refers to the LSTM model \cite{lstm}, and `c' refers to the proposed LSTM-UNet model}.}
+% \end{footnotesize}
+\end{center}
+\end{table*}
+
+
+
