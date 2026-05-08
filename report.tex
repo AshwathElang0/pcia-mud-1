@@ -15,7 +15,7 @@
 
 \begin{document}
 
-\title{AI-Assisted Colorimetric Analysis for Antibiotic Susceptibility Testing: A Computer Vision Approach}
+\title{AI-Assisted Colorimetric Analysis for Antibiotic Susceptibility Testing: Final Project Report and Inferences}
 
 \author{
   \IEEEauthorblockN{Ashwath}
@@ -149,7 +149,7 @@ The "Pinkness" (median $a^*$) was tracked over time for each antibiotic concentr
 \subsubsection{Freeze-Dried Bacterial Cellulose (FDBC) Assays}
 The necessity of the proposed affine normalization is clearly demonstrated in the FDBC experimental data. Without normalization, the sterility control row exhibits artificial fluctuations in color over time due to varying ambient lighting conditions (as shown in Fig. \ref{fig:fdbc_no_norm}). Since the control row should ideally maintain a constant colorimetric baseline, this variance highlights the susceptibility of raw image data to environmental noise.
 
-Following the application of the normalization pipeline, these lighting-induced variances are successfully corrected. As depicted in Fig. \ref{fig:fdbc_norm}, the normalized data reveals the true underlying biological trend: a clear, linear increase in the $a^*$ value (pinkness) for the bacteria-only row over time, accurately reflecting continuous, uninhibited bacterial metabolic activity.
+Following the application of the normalization pipeline, these lighting-induced variances are successfully corrected. However, despite the normalization, the biological trends on FDBC discs remained inconsistent across trials. The normalized data for the bacteria-only row often failed to show a reliable dose-response curve compared to the well-plate experiments.
 
 \begin{figure}[H]
 \centering
@@ -189,12 +189,32 @@ The JSD tracking (Fig. \ref{fig:jsd}) confirms that the distribution shift becom
 \label{fig:jsd}
 \end{figure}
 
-\section{Discussion}
-The proposed computer vision pipeline offers several advantages over traditional microplate readers. First, the use of SAM allows for high-fidelity segmentation without manual tuning of intensity thresholds. Second, the CIELAB $a^*$ channel provides a colorimetric quantification that is robust to common environmental artifacts. Finally, the statistical tracking framework (JSD/KS) allows for earlier detection of growth compared to simple thresholding, potentially reducing the time-to-result for AST.
+\section{Inferences and Takeaways}
+While the computer vision pipeline demonstrated technical success in segmentation and lighting normalization, the experimental transition to FDBC discs revealed significant physical and chemical challenges that hindered logical inferences.
 
-Future work will focus on expanding the dataset to include more bacterial strains and antibiotic types, as well as optimizing the predictive model for early failure detection in diagnostic tests.
+\subsection{Substrate-Induced Inconsistency}
+We observed that the FDBC discs did not yield consistent colorimetric patterns across repeated experiments. This inconsistency makes it difficult to establish a robust baseline for MIC determination on this specific substrate. 
+
+\subsection{Percolation and Particle Size Dynamics}
+A critical takeaway is the mismatch in physical distribution between the biological and chemical components:
+\begin{itemize}
+    \item \textbf{Surface Retention}: The bacteria, being larger biological entities, tend to remain trapped on the surface of the FDBC disc.
+    \item \textbf{Downward Percolation}: The Resazurin dye and the antibiotic molecules are significantly smaller in particle size. Consequently, they percolate down into the porous structure of the cellulose substrate.
+    \item \textbf{Reaction Hindrance}: This physical separation hinders the direct contact required for the redox reaction between the bacteria and the dye. It also creates non-uniform concentration dynamics for the antibiotic.
+\end{itemize}
+
+\subsection{Visual Quantification Artifacts}
+The percolation effect leads to a non-uniform and patchy color distribution on the disc surface. This patchiness creates "perceived color" anomalies that mess up the median-based quantification of the CIELAB $a^*$ channel. Even with high-fidelity SAM masks, the statistical representation of a "patchy" disk is less reliable than a uniform liquid well, leading to noise that obscures the biological signal.
+
+\section{Discussion}
+The computer vision pipeline, utilizing SAM and CIELAB normalization, proved to be a powerful tool for standardizing AST analysis. It effectively removed environmental lighting noise and provided precise fluid isolation. However, the study highlights that the choice of substrate is as critical as the analytical method. 
+
+The well-plate format provided clear, interpretable results and even allowed for the detection of secondary effects like photobleaching. In contrast, the FDBC format introduced physical variables---specifically percolation and surface-layer separation---that currently limit its diagnostic utility.
 
 \section{Conclusion}
-We have developed an AI-assisted colorimetric analysis pipeline for MIC determination. By leveraging modern computer vision techniques such as SAM and statistical distribution analysis, we achieved reliable quantification of bacterial growth in a cost-effective smartphone-based setup. This work paves the way for accessible, rapid antibiotic susceptibility testing in diverse clinical settings.
+We have developed an AI-assisted colorimetric analysis pipeline for MIC determination that achieves reliable results in liquid-based well-plate assays. While the system effectively handles image acquisition and normalization challenges, its application to FDBC substrates is currently limited by non-uniform reaction dynamics and particle percolation. Future iterations must address these physical constraints, perhaps through substrate modification or different loading techniques, to fully realize the potential of point-of-care AST.
+
+\section{Acknowledgments}
+This work was completed as a final project for the course EE5360: Practical Challenges in Image Analysis at IIT Hyderabad.
 
 \end{document}
